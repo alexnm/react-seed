@@ -4,7 +4,9 @@ import apiRoutes from "./apiRoutes";
 import React from "react";
 import { renderToString } from "react-dom/server";
 import { RouterContext, match } from "react-router";
-import routes from "../app/config/routes";
+import { Provider } from "react-redux";
+import routes from "../app/routes";
+import { configureStore } from "../app/store";
 
 const app = express( );
 
@@ -14,15 +16,20 @@ app.use( "/api", apiRoutes );
 
 app.use( ( req, res ) => {
     match( { routes: routes, location: req.url }, ( error, redirect, props ) => {
+        const store = configureStore( );
         const reactDom = renderToString(
-            <RouterContext { ...props } />
+            <Provider store={ store }>
+                <RouterContext { ...props } />
+            </Provider>
         );
 
-        res.set( "Content-Type", "text/html" ).status( 200 ).end( renderPage( reactDom ) );
+        const initialState = store.getState();
+
+        res.set( "Content-Type", "text/html" ).status( 200 ).end( renderPage( reactDom, initialState ) );
     } );
 } );
 
-const renderPage = ( reactDom ) => {
+const renderPage = ( reactDom, initialState ) => {
     return `
         <!doctype html>
         <html>
@@ -31,6 +38,9 @@ const renderPage = ( reactDom ) => {
             </head>
             <body>
                 <div id="react-root">${ reactDom }</div>
+                <script>
+                    window.__INITIAL_STATE__ = ${ JSON.stringify( initialState ) };
+                </script>
                 <script type="text/javascript" src="/dist/bundle.js"></script>
             </body>
         </html>

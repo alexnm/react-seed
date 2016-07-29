@@ -82,7 +82,7 @@
         ],
         "array-bracket-spacing": [ 2, "always" ],
         "space-infix-ops": 2,
-        "eol-last": 2,
+        "eol-last": 0,
         "lines-around-comment": [
             2,
             {
