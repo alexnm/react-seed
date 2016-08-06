@@ -1,12 +1,11 @@
 import React from "react";
-import { Route } from "react-router";
-import Home from "./components/home";
-import ProductList from "./components/productList";
-import Layout from "./layouts/layout";
+import { IndexRoute, Route } from "react-router";
+import { Home, ProductList } from "./views/pages";
+import Layout from "./views/layouts/layout";
 
 export default (
-    <Route component={ Layout }>
-        <Route path="/" component={ Home } />
+    <Route path="/" component={ Layout }>
+        <IndexRoute component={ Home } />
         <Route path="/products" component={ ProductList } />
     </Route>
 );

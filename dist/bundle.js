@@ -28386,13 +28386,7 @@
 
 	var _reactRouter = __webpack_require__(198);
 
-	var _home = __webpack_require__(261);
-
-	var _home2 = _interopRequireDefault(_home);
-
-	var _productList = __webpack_require__(262);
-
-	var _productList2 = _interopRequireDefault(_productList);
+	var _pages = __webpack_require__(261);
 
 	var _layout = __webpack_require__(263);
 
@@ -28402,13 +28396,37 @@
 
 	exports.default = _react2.default.createElement(
 	    _reactRouter.Route,
-	    { component: _layout2.default },
-	    _react2.default.createElement(_reactRouter.Route, { path: "/", component: _home2.default }),
-	    _react2.default.createElement(_reactRouter.Route, { path: "/products", component: _productList2.default })
+	    { path: "/", component: _layout2.default },
+	    _react2.default.createElement(_reactRouter.IndexRoute, { component: _pages.Home }),
+	    _react2.default.createElement(_reactRouter.Route, { path: "/products", component: _pages.ProductList })
 	);
 
 /***/ },
 /* 261 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	exports.ProductList = exports.Home = undefined;
+
+	var _home = __webpack_require__(262);
+
+	var _home2 = _interopRequireDefault(_home);
+
+	var _productList = __webpack_require__(272);
+
+	var _productList2 = _interopRequireDefault(_productList);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	exports.Home = _home2.default;
+	exports.ProductList = _productList2.default;
+
+/***/ },
+/* 262 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -28433,37 +28451,6 @@
 	                "h1",
 	                null,
 	                "Welcome to React!"
-	            )
-	        );
-	    }
-	});
-
-/***/ },
-/* 262 */
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
-
-	Object.defineProperty(exports, "__esModule", {
-	    value: true
-	});
-
-	var _react = __webpack_require__(1);
-
-	var _react2 = _interopRequireDefault(_react);
-
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-	exports.default = _react2.default.createClass({
-	    displayName: "productList",
-	    render: function render() {
-	        return _react2.default.createElement(
-	            "div",
-	            null,
-	            _react2.default.createElement(
-	                "h1",
-	                null,
-	                "Product List!"
 	            )
 	        );
 	    }
@@ -28848,6 +28835,40 @@
 	  var state = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
 	  return state;
 	};
+
+/***/ },
+/* 269 */,
+/* 270 */,
+/* 271 */,
+/* 272 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+
+	var _react = __webpack_require__(1);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	exports.default = _react2.default.createClass({
+	    displayName: "productList",
+	    render: function render() {
+	        return _react2.default.createElement(
+	            "div",
+	            null,
+	            _react2.default.createElement(
+	                "h1",
+	                null,
+	                "Product List!"
+	            )
+	        );
+	    }
+	});
 
 /***/ }
 /******/ ]);
