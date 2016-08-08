@@ -60,11 +60,13 @@
 
 	var _routes2 = _interopRequireDefault(_routes);
 
-	var _store = __webpack_require__(264);
+	var _store = __webpack_require__(265);
+
+	var _store2 = _interopRequireDefault(_store);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-	var store = (0, _store.configureStore)();
+	var store = (0, _store2.default)();
 
 	var rootHtml = _react2.default.createElement(
 	    _reactRedux.Provider,
@@ -28388,7 +28390,7 @@
 
 	var _pages = __webpack_require__(261);
 
-	var _layout = __webpack_require__(263);
+	var _layout = __webpack_require__(264);
 
 	var _layout2 = _interopRequireDefault(_layout);
 
@@ -28416,7 +28418,7 @@
 
 	var _home2 = _interopRequireDefault(_home);
 
-	var _productList = __webpack_require__(272);
+	var _productList = __webpack_require__(263);
 
 	var _productList2 = _interopRequireDefault(_productList);
 
@@ -28470,6 +28472,37 @@
 
 	var _react2 = _interopRequireDefault(_react);
 
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	exports.default = _react2.default.createClass({
+	    displayName: "productList",
+	    render: function render() {
+	        return _react2.default.createElement(
+	            "div",
+	            null,
+	            _react2.default.createElement(
+	                "h1",
+	                null,
+	                "Product List!"
+	            )
+	        );
+	    }
+	});
+
+/***/ },
+/* 264 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+
+	var _react = __webpack_require__(1);
+
+	var _react2 = _interopRequireDefault(_react);
+
 	var _reactRouter = __webpack_require__(198);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
@@ -28504,7 +28537,7 @@
 	});
 
 /***/ },
-/* 264 */
+/* 265 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -28512,19 +28545,19 @@
 	Object.defineProperty(exports, "__esModule", {
 	    value: true
 	});
-	exports.configureStore = configureStore;
+	exports.default = configureStore;
 
 	var _redux = __webpack_require__(179);
 
-	var _reduxThunk = __webpack_require__(265);
+	var _reduxThunk = __webpack_require__(266);
 
 	var _reduxThunk2 = _interopRequireDefault(_reduxThunk);
 
-	var _reduxLogger = __webpack_require__(266);
+	var _reduxLogger = __webpack_require__(267);
 
 	var _reduxLogger2 = _interopRequireDefault(_reduxLogger);
 
-	var _reducers = __webpack_require__(267);
+	var _reducers = __webpack_require__(268);
 
 	var _reducers2 = _interopRequireDefault(_reducers);
 
@@ -28539,7 +28572,7 @@
 	}
 
 /***/ },
-/* 265 */
+/* 266 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -28567,7 +28600,7 @@
 	exports['default'] = thunk;
 
 /***/ },
-/* 266 */
+/* 267 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -28800,7 +28833,7 @@
 	module.exports = createLogger;
 
 /***/ },
-/* 267 */
+/* 268 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -28811,7 +28844,7 @@
 
 	var _redux = __webpack_require__(179);
 
-	var _productsReducer = __webpack_require__(268);
+	var _productsReducer = __webpack_require__(269);
 
 	var _productsReducer2 = _interopRequireDefault(_productsReducer);
 
@@ -28822,7 +28855,7 @@
 	});
 
 /***/ },
-/* 268 */
+/* 269 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -28835,40 +28868,6 @@
 	  var state = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
 	  return state;
 	};
-
-/***/ },
-/* 269 */,
-/* 270 */,
-/* 271 */,
-/* 272 */
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
-
-	Object.defineProperty(exports, "__esModule", {
-	    value: true
-	});
-
-	var _react = __webpack_require__(1);
-
-	var _react2 = _interopRequireDefault(_react);
-
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-	exports.default = _react2.default.createClass({
-	    displayName: "productList",
-	    render: function render() {
-	        return _react2.default.createElement(
-	            "div",
-	            null,
-	            _react2.default.createElement(
-	                "h1",
-	                null,
-	                "Product List!"
-	            )
-	        );
-	    }
-	});
 
 /***/ }
 /******/ ]);

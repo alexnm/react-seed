@@ -3,5 +3,5 @@ import ProductList from "./productList";
 
 export {
     Home,
-    ProductList
+    ProductList,
 };

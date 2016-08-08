@@ -7,5 +7,5 @@ export default React.createClass( {
                 <h1>Product List!</h1>
             </div>
         );
-    }
+    },
 } );

@@ -6,6 +6,6 @@ export const GET_PRODUCTS_FAILED = "GET_PRODUCTS_FAILED";
 export function addToCart( product ) {
     return {
         type: ADD_TO_CART,
-        product
+        product,
     };
 }

@@ -1,12 +1,12 @@
 import express from "express";
-import apiRoutes from "./apiRoutes";
-
 import React from "react";
 import { renderToString } from "react-dom/server";
 import { RouterContext, match } from "react-router";
 import { Provider } from "react-redux";
+
+import apiRoutes from "./apiRoutes";
 import routes from "../app/routes";
-import { configureStore } from "../app/store";
+import configureStore from "../app/store";
 
 const app = express( );
 
@@ -15,7 +15,7 @@ app.use( "/dist", express.static( "dist" ) );
 app.use( "/api", apiRoutes );
 
 app.use( ( req, res ) => {
-    match( { routes: routes, location: req.url }, ( error, redirect, props ) => {
+    match( { routes, location: req.url }, ( error, redirect, props ) => {
         const store = configureStore( );
         const reactDom = renderToString(
             <Provider store={ store }>
@@ -25,11 +25,13 @@ app.use( ( req, res ) => {
 
         const initialState = store.getState();
 
-        res.set( "Content-Type", "text/html" ).status( 200 ).end( renderPage( reactDom, initialState ) );
+        res.set( "Content-Type", "text/html" )
+           .status( 200 )
+           .end( renderPage( reactDom, initialState ) );
     } );
 } );
 
-const renderPage = ( reactDom, initialState ) => {
+function renderPage( reactDom, initialState ) {
     return `
         <!doctype html>
         <html>
@@ -45,7 +47,7 @@ const renderPage = ( reactDom, initialState ) => {
             </body>
         </html>
     `;
-};
+}
 
 app.listen( 1234, ( err ) => {
     if ( !err ) {

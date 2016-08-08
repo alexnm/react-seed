@@ -7,5 +7,5 @@ export default React.createClass( {
                 <h1>Welcome to React!</h1>
             </div>
         );
-    }
+    },
 } );

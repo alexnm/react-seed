@@ -8,7 +8,7 @@ router.get( "/products", ( req, res ) => {
 } );
 
 router.get( "/products/:id", ( req, res ) => {
-    const product = data.products.filter( p => p.id == req.params.id )[ 0 ];
+    const product = data.products.filter( p => p.id === req.params.id )[ 0 ];
     res.json( product );
 } );
 
