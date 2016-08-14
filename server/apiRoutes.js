@@ -4,7 +4,7 @@ import data from "./apiData.json";
 const router = new Router();
 
 router.get( "/products", ( req, res ) => {
-    res.json( { products: data.products } );
+    setTimeout( ( ) => res.json( { products: data.products } ), 1000 );
 } );
 
 router.get( "/products/:id", ( req, res ) => {

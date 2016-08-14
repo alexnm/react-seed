@@ -1,10 +1,11 @@
 import React from "react";
 import { connect } from "react-redux";
 import { fetchProducts } from "../../actions/productActions";
+import { Api } from "../../helpers";
 
 const ProductList = React.createClass( {
     componentDidMount( ) {
-        this.props.dispatch( fetchProducts( ) );
+        this.props.dispatch( Api.get( fetchProducts ) );
     },
 
     productEntry( product, index ) {

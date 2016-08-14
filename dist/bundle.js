@@ -60,7 +60,7 @@
 
 	var _routes2 = _interopRequireDefault(_routes);
 
-	var _store = __webpack_require__(265);
+	var _store = __webpack_require__(266);
 
 	var _store2 = _interopRequireDefault(_store);
 
@@ -28390,7 +28390,7 @@
 
 	var _pages = __webpack_require__(261);
 
-	var _layout = __webpack_require__(264);
+	var _layout = __webpack_require__(265);
 
 	var _layout2 = _interopRequireDefault(_layout);
 
@@ -28474,14 +28474,16 @@
 
 	var _reactRedux = __webpack_require__(172);
 
-	var _productActions = __webpack_require__(270);
+	var _productActions = __webpack_require__(264);
+
+	var _helpers = __webpack_require__(273);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	var ProductList = _react2.default.createClass({
 	    displayName: "ProductList",
 	    componentDidMount: function componentDidMount() {
-	        this.props.dispatch((0, _productActions.fetchProducts)());
+	        this.props.dispatch(_helpers.Api.get(_productActions.fetchProducts));
 	    },
 	    productEntry: function productEntry(product, index) {
 	        return _react2.default.createElement(
@@ -28525,6 +28527,48 @@
 
 /***/ },
 /* 264 */
+/***/ function(module, exports) {
+
+	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	exports.addToCart = addToCart;
+	var ADD_TO_CART = exports.ADD_TO_CART = "ADD_TO_CART";
+	var GET_PRODUCTS = exports.GET_PRODUCTS = "GET_PRODUCTS";
+	var GET_PRODUCTS_COMPLETED = exports.GET_PRODUCTS_COMPLETED = "GET_PRODUCTS_COMPLETED";
+	var GET_PRODUCTS_FAILED = exports.GET_PRODUCTS_FAILED = "GET_PRODUCTS_FAILED";
+
+	function addToCart(product) {
+	    return {
+	        type: ADD_TO_CART,
+	        product: product
+	    };
+	}
+
+	var fetchProducts = exports.fetchProducts = {
+	    name: GET_PRODUCTS,
+	    started: function started() {
+	        return {
+	            type: GET_PRODUCTS
+	        };
+	    },
+	    completed: function completed(response) {
+	        return {
+	            type: GET_PRODUCTS_COMPLETED,
+	            products: response.products
+	        };
+	    },
+	    failed: function failed() {
+	        return {
+	            type: GET_PRODUCTS_FAILED
+	        };
+	    }
+	};
+
+/***/ },
+/* 265 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -28537,41 +28581,58 @@
 
 	var _react2 = _interopRequireDefault(_react);
 
+	var _reactRedux = __webpack_require__(172);
+
 	var _reactRouter = __webpack_require__(198);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-	exports.default = _react2.default.createClass({
-	    displayName: "layout",
-	    render: function render() {
-	        return _react2.default.createElement(
+	var Layout = function Layout(_ref) {
+	    var showSpinner = _ref.showSpinner;
+	    var children = _ref.children;
+
+	    var spinner = showSpinner ? _react2.default.createElement(
+	        "span",
+	        null,
+	        "Loading..."
+	    ) : "";
+
+	    return _react2.default.createElement(
+	        "div",
+	        null,
+	        _react2.default.createElement(
 	            "div",
 	            null,
 	            _react2.default.createElement(
-	                "div",
-	                null,
-	                _react2.default.createElement(
-	                    _reactRouter.Link,
-	                    { to: "/" },
-	                    "Home"
-	                ),
-	                _react2.default.createElement(
-	                    _reactRouter.Link,
-	                    { to: "/products" },
-	                    "Products"
-	                )
+	                _reactRouter.Link,
+	                { to: "/" },
+	                "Home"
 	            ),
 	            _react2.default.createElement(
-	                "div",
-	                null,
-	                this.props.children
+	                _reactRouter.Link,
+	                { to: "/products" },
+	                "Products"
 	            )
-	        );
-	    }
-	});
+	        ),
+	        _react2.default.createElement(
+	            "div",
+	            null,
+	            spinner,
+	            children
+	        )
+	    );
+	};
+
+	function mapStateToProps(state) {
+	    return {
+	        showSpinner: state.busy > 0
+	    };
+	}
+
+	exports.default = (0, _reactRedux.connect)(mapStateToProps)(Layout);
 
 /***/ },
-/* 265 */
+/* 266 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -28583,15 +28644,15 @@
 
 	var _redux = __webpack_require__(179);
 
-	var _reduxThunk = __webpack_require__(266);
+	var _reduxThunk = __webpack_require__(267);
 
 	var _reduxThunk2 = _interopRequireDefault(_reduxThunk);
 
-	var _reduxLogger = __webpack_require__(267);
+	var _reduxLogger = __webpack_require__(268);
 
 	var _reduxLogger2 = _interopRequireDefault(_reduxLogger);
 
-	var _reducers = __webpack_require__(268);
+	var _reducers = __webpack_require__(269);
 
 	var _reducers2 = _interopRequireDefault(_reducers);
 
@@ -28606,7 +28667,7 @@
 	}
 
 /***/ },
-/* 266 */
+/* 267 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -28634,7 +28695,7 @@
 	exports['default'] = thunk;
 
 /***/ },
-/* 267 */
+/* 268 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -28867,7 +28928,7 @@
 	module.exports = createLogger;
 
 /***/ },
-/* 268 */
+/* 269 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -28878,18 +28939,23 @@
 
 	var _redux = __webpack_require__(179);
 
-	var _productsReducer = __webpack_require__(269);
+	var _busyReducer = __webpack_require__(270);
+
+	var _busyReducer2 = _interopRequireDefault(_busyReducer);
+
+	var _productsReducer = __webpack_require__(272);
 
 	var _productsReducer2 = _interopRequireDefault(_productsReducer);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	exports.default = (0, _redux.combineReducers)({
+	    busy: _busyReducer2.default,
 	    products: _productsReducer2.default
 	});
 
 /***/ },
-/* 269 */
+/* 270 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -28898,7 +28964,66 @@
 	    value: true
 	});
 
-	var _productActions = __webpack_require__(270);
+	var _apiActions = __webpack_require__(271);
+
+	var initialState = 0;
+
+	exports.default = function () {
+	    var state = arguments.length <= 0 || arguments[0] === undefined ? initialState : arguments[0];
+	    var action = arguments[1];
+
+	    switch (action.type) {
+
+	        case _apiActions.API_CALL_STARTED:
+	            return state + 1;
+	        case _apiActions.API_CALL_ENDED:
+	            return state - 1;
+
+	        default:
+	            return state;
+	    }
+	};
+
+/***/ },
+/* 271 */
+/***/ function(module, exports) {
+
+	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	var API_CALL_STARTED = exports.API_CALL_STARTED = "API_CALL_STARTED";
+	var API_CALL_ENDED = exports.API_CALL_ENDED = "API_CALL_ENDED";
+
+	function apiCallStarted() {
+	    return {
+	        type: API_CALL_STARTED
+	    };
+	}
+
+	function apiCallEnded() {
+	    return {
+	        type: API_CALL_ENDED
+	    };
+	}
+
+	exports.default = {
+	    apiCallStarted: apiCallStarted,
+	    apiCallEnded: apiCallEnded
+	};
+
+/***/ },
+/* 272 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+
+	var _productActions = __webpack_require__(264);
 
 	var initialState = { products: [] };
 
@@ -28918,7 +29043,7 @@
 	};
 
 /***/ },
-/* 270 */
+/* 273 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -28926,62 +29051,23 @@
 	Object.defineProperty(exports, "__esModule", {
 	    value: true
 	});
-	exports.GET_PRODUCTS_FAILED = exports.GET_PRODUCTS_COMPLETED = exports.GET_PRODUCTS = exports.ADD_TO_CART = undefined;
-	exports.addToCart = addToCart;
-	exports.getProductsCompleted = getProductsCompleted;
-	exports.fetchProducts = fetchProducts;
+	exports.fetch = exports.Api = undefined;
 
-	var _helpers = __webpack_require__(271);
+	var _api = __webpack_require__(277);
 
-	var ADD_TO_CART = exports.ADD_TO_CART = "ADD_TO_CART";
-	var GET_PRODUCTS = exports.GET_PRODUCTS = "GET_PRODUCTS";
-	var GET_PRODUCTS_COMPLETED = exports.GET_PRODUCTS_COMPLETED = "GET_PRODUCTS_COMPLETED";
-	var GET_PRODUCTS_FAILED = exports.GET_PRODUCTS_FAILED = "GET_PRODUCTS_FAILED";
+	var _api2 = _interopRequireDefault(_api);
 
-	function addToCart(product) {
-	    return {
-	        type: ADD_TO_CART,
-	        product: product
-	    };
-	}
-
-	function getProductsCompleted(response) {
-	    return {
-	        type: GET_PRODUCTS_COMPLETED,
-	        products: response.products
-	    };
-	}
-
-	function fetchProducts() {
-	    return function (dispatch) {
-	        var url = "/api/products";
-	        return (0, _helpers.fetch)(url, "GET").then(function (res) {
-	            return dispatch(getProductsCompleted(res));
-	        });
-	    };
-	}
-
-/***/ },
-/* 271 */
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
-
-	Object.defineProperty(exports, "__esModule", {
-	    value: true
-	});
-	exports.fetch = undefined;
-
-	var _fetch = __webpack_require__(272);
+	var _fetch = __webpack_require__(274);
 
 	var _fetch2 = _interopRequireDefault(_fetch);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+	exports.Api = _api2.default;
 	exports.fetch = _fetch2.default;
 
 /***/ },
-/* 272 */
+/* 274 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -28990,7 +29076,7 @@
 	    value: true
 	});
 
-	var _isomorphicFetch = __webpack_require__(273);
+	var _isomorphicFetch = __webpack_require__(275);
 
 	var _isomorphicFetch2 = _interopRequireDefault(_isomorphicFetch);
 
@@ -29033,19 +29119,19 @@
 	}
 
 /***/ },
-/* 273 */
+/* 275 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// the whatwg-fetch polyfill installs the fetch() function
 	// on the global object (window or self)
 	//
 	// Return that as the export for use in Webpack, Browserify etc.
-	__webpack_require__(274);
+	__webpack_require__(276);
 	module.exports = self.fetch.bind(self);
 
 
 /***/ },
-/* 274 */
+/* 276 */
 /***/ function(module, exports) {
 
 	(function(self) {
@@ -29482,6 +29568,65 @@
 	  self.fetch.polyfill = true
 	})(typeof self !== 'undefined' ? self : this);
 
+
+/***/ },
+/* 277 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+
+	var _fetch = __webpack_require__(274);
+
+	var _fetch2 = _interopRequireDefault(_fetch);
+
+	var _apiActions = __webpack_require__(271);
+
+	var _apiActions2 = _interopRequireDefault(_apiActions);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	exports.default = {
+	    get: apiCall.bind(null, "GET")
+	};
+
+
+	function apiCall(method, action) {
+	    return function (dispatch) {
+	        var url = urlMapper(action);
+	        dispatch(action.started());
+	        dispatch(_apiActions2.default.apiCallStarted());
+	        return (0, _fetch2.default)(url, "GET").then(function (res) {
+	            return handleResponse(res, action, dispatch);
+	        }, function (err) {
+	            return handleError(err, action, dispatch);
+	        });
+	    };
+	}
+
+	function urlMapper(action, params) {
+	    switch (action.name) {
+	        case "GET_PRODUCTS":
+	            return "/api/products";
+	        case "GET_PRODUCT_DETAILS":
+	            return "/api/products/" + params.id;
+	        default:
+	            return null;
+	    }
+	}
+
+	function handleResponse(response, action, dispatch) {
+	    dispatch(_apiActions2.default.apiCallEnded());
+	    dispatch(action.completed(response));
+	}
+
+	function handleError(response, action, dispatch) {
+	    dispatch(_apiActions2.default.apiCallEnded());
+	    dispatch(action.failed(response));
+	}
 
 /***/ }
 /******/ ]);
