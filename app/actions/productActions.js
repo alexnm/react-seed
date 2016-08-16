@@ -1,7 +1,12 @@
-export const ADD_TO_CART = "ADD_TO_CART";
-export const GET_PRODUCTS = "GET_PRODUCTS";
-export const GET_PRODUCTS_COMPLETED = "GET_PRODUCTS_COMPLETED";
-export const GET_PRODUCTS_FAILED = "GET_PRODUCTS_FAILED";
+import {
+    ADD_TO_CART,
+    GET_PRODUCT,
+    GET_PRODUCT_COMPLETED,
+    GET_PRODUCT_FAILED,
+    GET_PRODUCTS,
+    GET_PRODUCTS_COMPLETED,
+    GET_PRODUCTS_FAILED,
+} from "../actionIdentifiers";
 
 export function addToCart( product ) {
     return {
@@ -9,6 +14,20 @@ export function addToCart( product ) {
         product,
     };
 }
+
+export const fetchProduct = {
+    name: GET_PRODUCT,
+    started: ( ) => ( {
+        type: GET_PRODUCT,
+    } ),
+    completed: response => ( {
+        type: GET_PRODUCT_COMPLETED,
+        product: response.product,
+    } ),
+    failed: ( ) => ( {
+        type: GET_PRODUCT_FAILED,
+    } ),
+};
 
 export const fetchProducts = {
     name: GET_PRODUCTS,

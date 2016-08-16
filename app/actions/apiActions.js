@@ -1,5 +1,4 @@
-export const API_CALL_STARTED = "API_CALL_STARTED";
-export const API_CALL_ENDED = "API_CALL_ENDED";
+import { API_CALL_STARTED, API_CALL_ENDED } from "../actionIdentifiers";
 
 function apiCallStarted( ) {
     return {

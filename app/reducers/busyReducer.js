@@ -1,4 +1,4 @@
-import { API_CALL_STARTED, API_CALL_ENDED } from "../actions/apiActions";
+import { API_CALL_STARTED, API_CALL_ENDED } from "../actionIdentifiers";
 
 const initialState = 0;
 

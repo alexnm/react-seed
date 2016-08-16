@@ -1,4 +1,4 @@
-import { GET_PRODUCTS_COMPLETED } from "../actions/productActions";
+import { GET_PRODUCTS_COMPLETED } from "../actionIdentifiers";
 
 const initialState = { products: [ ] };
 
