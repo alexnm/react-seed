@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router";
 import { connect } from "react-redux";
 import { fetchProducts } from "../../actions/productActions";
 import { Api } from "../../helpers";
@@ -11,7 +12,9 @@ const ProductList = React.createClass( {
     productEntry( product, index ) {
         return (
             <div key={ index }>
-                <strong>{ product.name }</strong> - <span>{ product.price }</span>
+                <Link to={ `/products/${ product.id }` }>
+                    { product.name }
+                </Link> - <span>{ product.price }</span>
             </div>
         );
     },
@@ -29,7 +32,7 @@ const ProductList = React.createClass( {
 
 function mapStateToProps( state ) {
     return {
-        products: state.products.products,
+        products: state.products,
     };
 }
 

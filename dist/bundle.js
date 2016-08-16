@@ -28400,7 +28400,8 @@
 	    _reactRouter.Route,
 	    { path: "/", component: _layout2.default },
 	    _react2.default.createElement(_reactRouter.IndexRoute, { component: _pages.Home }),
-	    _react2.default.createElement(_reactRouter.Route, { path: "/products", component: _pages.ProductList })
+	    _react2.default.createElement(_reactRouter.Route, { path: "/products", component: _pages.ProductList }),
+	    _react2.default.createElement(_reactRouter.Route, { path: "/products/:id", component: _pages.ProductDetails })
 	);
 
 /***/ },
@@ -28412,11 +28413,15 @@
 	Object.defineProperty(exports, "__esModule", {
 	    value: true
 	});
-	exports.ProductList = exports.Home = undefined;
+	exports.ProductList = exports.ProductDetails = exports.Home = undefined;
 
 	var _home = __webpack_require__(262);
 
 	var _home2 = _interopRequireDefault(_home);
+
+	var _productDetails = __webpack_require__(281);
+
+	var _productDetails2 = _interopRequireDefault(_productDetails);
 
 	var _productList = __webpack_require__(263);
 
@@ -28425,6 +28430,7 @@
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	exports.Home = _home2.default;
+	exports.ProductDetails = _productDetails2.default;
 	exports.ProductList = _productList2.default;
 
 /***/ },
@@ -28472,6 +28478,8 @@
 
 	var _react2 = _interopRequireDefault(_react);
 
+	var _reactRouter = __webpack_require__(198);
+
 	var _reactRedux = __webpack_require__(172);
 
 	var _productActions = __webpack_require__(264);
@@ -28490,8 +28498,8 @@
 	            "div",
 	            { key: index },
 	            _react2.default.createElement(
-	                "strong",
-	                null,
+	                _reactRouter.Link,
+	                { to: "/products/" + product.id },
 	                product.name
 	            ),
 	            " - ",
@@ -28519,7 +28527,7 @@
 
 	function mapStateToProps(state) {
 	    return {
-	        products: state.products.products
+	        products: state.products
 	    };
 	}
 
@@ -28647,6 +28655,8 @@
 
 	var _apiActions2 = _interopRequireDefault(_apiActions);
 
+	var _actionIdentifiers = __webpack_require__(265);
+
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	exports.default = {
@@ -28654,9 +28664,9 @@
 	};
 
 
-	function apiCall(method, action) {
+	function apiCall(method, action, params) {
 	    return function (dispatch) {
-	        var url = urlMapper(action);
+	        var url = urlMapper(action, params);
 	        dispatch(action.started());
 	        dispatch(_apiActions2.default.apiCallStarted());
 	        return (0, _fetch2.default)(url, "GET").then(function (res) {
@@ -28669,9 +28679,9 @@
 
 	function urlMapper(action, params) {
 	    switch (action.name) {
-	        case "GET_PRODUCTS":
+	        case _actionIdentifiers.GET_PRODUCTS:
 	            return "/api/products";
-	        case "GET_PRODUCT_DETAILS":
+	        case _actionIdentifiers.GET_PRODUCT:
 	            return "/api/products/" + params.id;
 	        default:
 	            return null;
@@ -29596,15 +29606,20 @@
 
 	var _busyReducer2 = _interopRequireDefault(_busyReducer);
 
-	var _productsReducer = __webpack_require__(278);
+	var _productDetailsReducer = __webpack_require__(280);
 
-	var _productsReducer2 = _interopRequireDefault(_productsReducer);
+	var _productDetailsReducer2 = _interopRequireDefault(_productDetailsReducer);
+
+	var _productListReducer = __webpack_require__(279);
+
+	var _productListReducer2 = _interopRequireDefault(_productListReducer);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	exports.default = (0, _redux.combineReducers)({
 	    busy: _busyReducer2.default,
-	    products: _productsReducer2.default
+	    selectedProduct: _productDetailsReducer2.default,
+	    products: _productListReducer2.default
 	});
 
 /***/ },
@@ -29638,7 +29653,8 @@
 	};
 
 /***/ },
-/* 278 */
+/* 278 */,
+/* 279 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -29649,22 +29665,119 @@
 
 	var _actionIdentifiers = __webpack_require__(265);
 
-	var initialState = { products: [] };
+	var initialState = [];
 
 	exports.default = function () {
 	    var state = arguments.length <= 0 || arguments[0] === undefined ? initialState : arguments[0];
 	    var action = arguments[1];
 
 	    switch (action.type) {
+
 	        case _actionIdentifiers.GET_PRODUCTS_COMPLETED:
-	            return {
-	                products: action.products
-	            };
+	            return action.products;
 
 	        default:
 	            return state;
 	    }
 	};
+
+/***/ },
+/* 280 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+
+	var _actionIdentifiers = __webpack_require__(265);
+
+	var initialState = {};
+
+	exports.default = function () {
+	    var state = arguments.length <= 0 || arguments[0] === undefined ? initialState : arguments[0];
+	    var action = arguments[1];
+
+	    switch (action.type) {
+
+	        case _actionIdentifiers.GET_PRODUCT:
+	            return {};
+
+	        case _actionIdentifiers.GET_PRODUCT_COMPLETED:
+	            return action.product;
+
+	        default:
+	            return state;
+	    }
+	};
+
+/***/ },
+/* 281 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+
+	var _react = __webpack_require__(1);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	var _reactRedux = __webpack_require__(172);
+
+	var _productActions = __webpack_require__(264);
+
+	var _helpers = __webpack_require__(266);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	var ProductDetails = _react2.default.createClass({
+	    displayName: "ProductDetails",
+	    componentDidMount: function componentDidMount() {
+	        console.log(this.props);
+	        this.props.dispatch(_helpers.Api.get(_productActions.fetchProduct, { id: this.props.params.id }));
+	    },
+	    render: function render() {
+	        var product = this.props.product;
+	        return _react2.default.createElement(
+	            "div",
+	            null,
+	            _react2.default.createElement(
+	                "h1",
+	                null,
+	                "Product Details!"
+	            ),
+	            _react2.default.createElement(
+	                "h2",
+	                null,
+	                product.name
+	            ),
+	            _react2.default.createElement(
+	                "p",
+	                null,
+	                "Price: $",
+	                product.price
+	            ),
+	            _react2.default.createElement(
+	                "p",
+	                null,
+	                "Description: ",
+	                product.description
+	            )
+	        );
+	    }
+	});
+
+	function mapStateToProps(state) {
+	    return {
+	        product: state.selectedProduct
+	    };
+	}
+
+	exports.default = (0, _reactRedux.connect)(mapStateToProps)(ProductDetails);
 
 /***/ }
 /******/ ]);

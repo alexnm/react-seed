@@ -1,13 +1,12 @@
 import { GET_PRODUCTS_COMPLETED } from "../actionIdentifiers";
 
-const initialState = { products: [ ] };
+const initialState = [ ];
 
 export default ( state = initialState, action ) => {
     switch ( action.type ) {
+
     case GET_PRODUCTS_COMPLETED:
-        return {
-            products: action.products,
-        };
+        return action.products;
 
     default: return state;
     }
