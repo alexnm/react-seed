@@ -5,8 +5,14 @@ import { fetchProducts } from "../../actions/productActions";
 import { Api } from "../../helpers";
 
 const ProductList = React.createClass( {
+    statics: {
+        prerequisites: ( ) => Api.get( fetchProducts ),
+    },
+
     componentDidMount( ) {
-        this.props.dispatch( Api.get( fetchProducts ) );
+        if ( this.props.products.length === 0 ) {
+            this.props.dispatch( Api.get( fetchProducts ) );
+        }
     },
 
     productEntry( product, index ) {

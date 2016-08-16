@@ -4,8 +4,14 @@ import { fetchProduct } from "../../actions/productActions";
 import { Api } from "../../helpers";
 
 const ProductDetails = React.createClass( {
+    statics: {
+        prerequisites: ( { params } ) => Api.get( fetchProduct, { id: params.id } ),
+    },
+
     componentDidMount( ) {
-        this.props.dispatch( Api.get( fetchProduct, { id: this.props.params.id } ) );
+        if ( this.props.product.id !== parseInt( this.props.params.id, 10 ) ) {
+            this.props.dispatch( Api.get( fetchProduct, { id: this.props.params.id } ) );
+        }
     },
 
     render( ) {

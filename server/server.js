@@ -17,17 +17,19 @@ app.use( "/api", apiRoutes );
 app.use( ( req, res ) => {
     match( { routes, location: req.url }, ( error, redirect, props ) => {
         const store = configureStore( );
-        const reactDom = renderToString(
-            <Provider store={ store }>
-                <RouterContext { ...props } />
-            </Provider>
-        );
+        fetchDataForComponents( props, store ).then( ( ) => {
+            const reactDom = renderToString(
+                <Provider store={ store }>
+                    <RouterContext { ...props } />
+                </Provider>
+            );
 
-        const initialState = store.getState();
+            const initialState = store.getState( );
 
-        res.set( "Content-Type", "text/html" )
-           .status( 200 )
-           .end( renderPage( reactDom, initialState ) );
+            res.set( "Content-Type", "text/html" )
+                .status( 200 )
+                .end( renderPage( reactDom, initialState ) );
+        } );
     } );
 } );
 
@@ -41,12 +43,20 @@ function renderPage( reactDom, initialState ) {
             <body>
                 <div id="react-root">${ reactDom }</div>
                 <script>
-                    window.__INITIAL_STATE__ = ${ JSON.stringify( initialState ) };
+                    window.INITIAL_STATE = ${ JSON.stringify( initialState ) };
                 </script>
                 <script type="text/javascript" src="/dist/bundle.js"></script>
             </body>
         </html>
     `;
+}
+
+function fetchDataForComponents( renderProps, store ) {
+    const promises = renderProps.components
+                                .filter( comp => comp.prerequisites )
+                                .map( comp => store.dispatch( comp.prerequisites( renderProps ) ) );
+
+    return Promise.all( promises );
 }
 
 app.listen( 1234, ( err ) => {

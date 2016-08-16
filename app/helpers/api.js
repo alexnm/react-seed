@@ -19,11 +19,16 @@ function apiCall( method, action, params ) {
 }
 
 function urlMapper( action, params ) {
+    const baseUrl = getBaseUrl( );
     switch ( action.name ) {
-    case GET_PRODUCTS: return "/api/products";
-    case GET_PRODUCT: return `/api/products/${ params.id }`;
+    case GET_PRODUCTS: return `${ baseUrl }/products`;
+    case GET_PRODUCT: return `${ baseUrl }/products/${ params.id }`;
     default: return null;
     }
+}
+
+function getBaseUrl( ) {
+    return typeof document === "undefined" ? "http://localhost:1234/api" : "/api";
 }
 
 function handleResponse( response, action, dispatch ) {
