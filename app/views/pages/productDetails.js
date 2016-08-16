@@ -5,7 +5,6 @@ import { Api } from "../../helpers";
 
 const ProductDetails = React.createClass( {
     componentDidMount( ) {
-        console.log( this.props );
         this.props.dispatch( Api.get( fetchProduct, { id: this.props.params.id } ) );
     },
 
