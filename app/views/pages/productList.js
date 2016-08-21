@@ -36,10 +36,8 @@ const ProductList = React.createClass( {
     },
 } );
 
-function mapStateToProps( state ) {
-    return {
-        products: state.products,
-    };
-}
+const mapStateToProps = ( state ) => ( {
+    products: state.products,
+} );
 
 export default connect( mapStateToProps )( ProductList );

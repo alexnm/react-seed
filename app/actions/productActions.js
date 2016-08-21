@@ -8,12 +8,10 @@ import {
     GET_PRODUCTS_FAILED,
 } from "../actionIdentifiers";
 
-export function addToCart( product ) {
-    return {
-        type: ADD_TO_CART,
-        product,
-    };
-}
+export const addToCart = product => ( {
+    type: ADD_TO_CART,
+    product,
+} );
 
 export const fetchProduct = {
     name: GET_PRODUCT,

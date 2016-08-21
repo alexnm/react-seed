@@ -4,6 +4,9 @@ import { GET_PRODUCT, GET_PRODUCTS } from "../actionIdentifiers";
 
 export default {
     get: apiCall.bind( null, "GET" ),
+    delete: apiCall.bind( null, "DELETE" ),
+    post: apiCall.bind( null, "POST" ),
+    put: apiCall.bind( null, "PUT" ),
 };
 
 function apiCall( method, action, params ) {
