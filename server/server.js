@@ -3,6 +3,7 @@ import React from "react";
 import { renderToString } from "react-dom/server";
 import { RouterContext, match } from "react-router";
 import { Provider } from "react-redux";
+import Helmet from "react-helmet";
 
 import apiRoutes from "./apiRoutes";
 import routes from "../app/routes";
@@ -24,21 +25,24 @@ app.use( ( req, res ) => {
                 </Provider>
             );
 
+            const head = Helmet.rewind( );
             const initialState = store.getState( );
 
             res.set( "Content-Type", "text/html" )
                 .status( 200 )
-                .end( renderPage( reactDom, initialState ) );
+                .end( renderPage( reactDom, head, initialState ) );
         } );
     } );
 } );
 
-function renderPage( reactDom, initialState ) {
+function renderPage( reactDom, head, initialState ) {
     return `
         <!doctype html>
         <html>
             <head>
-
+                ${ head.title.toString( ) }
+                ${ head.meta.toString( ) }
+                ${ head.link.toString( ) }
             </head>
             <body>
                 <div id="react-root">${ reactDom }</div>

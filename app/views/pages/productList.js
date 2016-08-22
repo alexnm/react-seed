@@ -1,6 +1,7 @@
 import React from "react";
 import { Link } from "react-router";
 import { connect } from "react-redux";
+import Helmet from "react-helmet";
 import { fetchProducts } from "../../actions/productActions";
 import { Api } from "../../helpers";
 
@@ -29,6 +30,7 @@ const ProductList = React.createClass( {
         const products = this.props.products;
         return (
             <div>
+                <Helmet title="Fresh food!" />
                 <h1>Product List!</h1>
                 { products.map( this.productEntry ) }
             </div>
