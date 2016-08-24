@@ -16,8 +16,9 @@ app.use( "/dist", express.static( "dist" ) );
 app.use( "/api", apiRoutes );
 
 app.use( ( req, res ) => {
-    match( { routes, location: req.url }, ( error, redirect, props ) => {
-        const store = configureStore( );
+    const store = configureStore( );
+
+    match( { routes: routes( store.dispatch ), location: req.url }, ( error, redirect, props ) => {
         fetchDataForComponents( props, store ).then( ( ) => {
             const reactDom = renderToString(
                 <Provider store={ store }>

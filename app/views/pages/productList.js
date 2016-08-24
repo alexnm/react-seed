@@ -10,12 +10,6 @@ const ProductList = React.createClass( {
         prerequisites: ( ) => Api.get( fetchProducts ),
     },
 
-    componentDidMount( ) {
-        if ( this.props.products.length === 0 ) {
-            this.props.dispatch( Api.get( fetchProducts ) );
-        }
-    },
-
     productEntry( product, index ) {
         return (
             <div key={ index }>
