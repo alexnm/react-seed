@@ -1,23 +1,13 @@
 import React from "react";
-import { Link } from "react-router";
 import { connect } from "react-redux";
 import Helmet from "react-helmet";
 import { fetchProducts } from "../../actions/productActions";
 import { Api } from "../../helpers";
+import { ProductEntry } from "../components";
 
 const ProductList = React.createClass( {
     statics: {
         prerequisites: ( ) => Api.get( fetchProducts ),
-    },
-
-    productEntry( product, index ) {
-        return (
-            <div key={ index }>
-                <Link to={ `/products/${ product.id }` }>
-                    { product.name }
-                </Link> - <span>{ product.price }</span>
-            </div>
-        );
     },
 
     render( ) {
@@ -26,7 +16,9 @@ const ProductList = React.createClass( {
             <div>
                 <Helmet title="Fresh food!" />
                 <h1>Product List!</h1>
-                { products.map( this.productEntry ) }
+                { products.map( ( product, index ) => (
+                    <ProductEntry product={ product } key={ index } />
+                ) ) }
             </div>
         );
     },
