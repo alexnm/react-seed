@@ -6,6 +6,10 @@ import { Api } from "../../helpers";
 import { ProductEntry } from "../components";
 
 const ProductList = React.createClass( {
+    propTypes: {
+        products: React.PropTypes.object,
+    },
+
     statics: {
         prerequisites: ( ) => Api.get( fetchProducts ),
     },

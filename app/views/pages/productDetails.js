@@ -4,6 +4,12 @@ import { fetchProduct } from "../../actions/productActions";
 import { Api } from "../../helpers";
 
 const ProductDetails = React.createClass( {
+    propTypes: {
+        params: React.PropTypes.object,
+        product: React.PropTypes.object.isRequired,
+        dispatch: React.PropTypes.func,
+    },
+
     statics: {
         prerequisites: ( { params } ) => Api.get( fetchProduct, { id: params.id } ),
     },

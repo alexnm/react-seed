@@ -1,10 +1,16 @@
 import React from "react";
 import { Link } from "react-router";
 
-export default ( { product } ) => (
+const ProductEntry = ( { product } ) => (
     <div>
         <Link to={ `/products/${ product.id }` }>
             { product.name }
         </Link> - <span>{ product.price }</span>
     </div>
 );
+
+ProductEntry.propTypes = {
+    product: React.PropTypes.object,
+};
+
+export default ProductEntry;

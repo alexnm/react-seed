@@ -19,6 +19,11 @@ const Layout = ( { showSpinner, children } ) => {
     );
 };
 
+Layout.propTypes = {
+    showSpinner: React.PropTypes.bool,
+    children: React.PropTypes.object,
+};
+
 function mapStateToProps( state ) {
     return {
         showSpinner: state.busy > 0,
