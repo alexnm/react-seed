@@ -17,8 +17,4 @@ const Cart = React.createClass( {
     },
 } );
 
-const mapStateToProps = ( state ) => ( {
-
-} );
-
-export default connect( mapStateToProps )( Cart );
+export default connect( null )( Cart );

@@ -12,6 +12,10 @@ router.get( "/products/:id", ( req, res ) => {
     setTimeout( ( ) => res.json( { product } ), 500 );
 } );
 
+router.post( "/login", ( req, res ) => {
+    setTimeout( ( ) => res.json( { token: "123" } ), 500 );
+} );
+
 function productOverview( product ) {
     return {
         id: product.id,

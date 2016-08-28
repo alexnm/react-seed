@@ -1,6 +1,6 @@
 import fetch from "./fetch";
 import { apiCallStarted, apiCallEnded } from "../actions/apiActions";
-import { GET_PRODUCT, GET_PRODUCTS } from "../actionIdentifiers";
+import { GET_PRODUCT, GET_PRODUCTS, LOGIN } from "../actionIdentifiers";
 
 const apiCall = ( method ) => ( action ) => ( params, body ) => ( dispatch ) => {
     const url = urlMapper( action, params );
@@ -17,7 +17,8 @@ function urlMapper( action, params ) {
     switch ( action.name ) {
     case GET_PRODUCTS: return `${ baseUrl }/products`;
     case GET_PRODUCT: return `${ baseUrl }/products/${ params.id }`;
-    default: return null;
+    case LOGIN: return `${ baseUrl }/login`;
+    default: throw new Error( "action does not have a url defined in api.js" );
     }
 }
 

@@ -18,7 +18,7 @@ app.use( "/api", apiRoutes );
 app.use( ( req, res ) => {
     const store = configureStore( );
 
-    match( { routes: routes( store.dispatch ), location: req.url }, ( error, redirect, props ) => {
+    match( { routes: routes( store.dispatch, store.getState ), location: req.url }, ( error, redirect, props ) => {
         fetchDataForComponents( props, store ).then( ( ) => {
             const reactDom = renderToString(
                 <Provider store={ store }>
