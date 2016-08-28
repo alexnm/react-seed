@@ -1,25 +1,16 @@
 import fetch from "./fetch";
-import ApiActions from "../actions/apiActions";
+import { apiCallStarted, apiCallEnded } from "../actions/apiActions";
 import { GET_PRODUCT, GET_PRODUCTS } from "../actionIdentifiers";
 
-export default {
-    get: apiCall.bind( null, "GET" ),
-    delete: apiCall.bind( null, "DELETE" ),
-    post: apiCall.bind( null, "POST" ),
-    put: apiCall.bind( null, "PUT" ),
+const apiCall = ( method ) => ( action ) => ( params, body ) => ( dispatch ) => {
+    const url = urlMapper( action, params );
+    dispatch( action.started );
+    dispatch( apiCallStarted );
+    return fetch( url, method, body ).then(
+        res => handleResponse( res, action, dispatch ),
+        err => handleError( err, action, dispatch )
+    );
 };
-
-function apiCall( method, action, params ) {
-    return ( dispatch ) => {
-        const url = urlMapper( action, params );
-        dispatch( action.started( ) );
-        dispatch( ApiActions.apiCallStarted( ) );
-        return fetch( url, "GET" ).then(
-            res => handleResponse( res, action, dispatch ),
-            err => handleError( err, action, dispatch )
-        );
-    };
-}
 
 function urlMapper( action, params ) {
     const baseUrl = getBaseUrl( );
@@ -35,11 +26,18 @@ function getBaseUrl( ) {
 }
 
 function handleResponse( response, action, dispatch ) {
-    dispatch( ApiActions.apiCallEnded( ) );
+    dispatch( apiCallEnded );
     dispatch( action.completed( response ) );
 }
 
 function handleError( response, action, dispatch ) {
-    dispatch( ApiActions.apiCallEnded( ) );
+    dispatch( apiCallEnded );
     dispatch( action.failed( response ) );
 }
+
+export default {
+    get: apiCall( "GET" ),
+    delete: apiCall( "DELETE" ),
+    post: apiCall( "POST" ),
+    put: apiCall( "PUT" ),
+};

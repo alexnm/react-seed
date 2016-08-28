@@ -7,28 +7,30 @@ export const addToCart = product => ( {
 
 export const fetchProduct = {
     name: Actions.GET_PRODUCT,
-    started: ( ) => ( {
+    started: {
         type: Actions.GET_PRODUCT,
-    } ),
-    completed: response => ( {
+    },
+    completed: ( response ) => ( {
         type: Actions.GET_PRODUCT_COMPLETED,
         product: response.product,
     } ),
-    failed: ( ) => ( {
+    failed: ( error ) => ( {
         type: Actions.GET_PRODUCT_FAILED,
+        message: error.message,
     } ),
 };
 
 export const fetchProducts = {
     name: Actions.GET_PRODUCTS,
-    started: ( ) => ( {
+    started: {
         type: Actions.GET_PRODUCTS,
-    } ),
-    completed: response => ( {
+    },
+    completed: ( response ) => ( {
         type: Actions.GET_PRODUCTS_COMPLETED,
         products: response.products,
     } ),
-    failed: ( ) => ( {
+    failed: ( error ) => ( {
         type: Actions.GET_PRODUCTS_FAILED,
+        message: error.message,
     } ),
 };
