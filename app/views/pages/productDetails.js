@@ -35,10 +35,8 @@ const ProductDetails = React.createClass( {
     },
 } );
 
-function mapStateToProps( state ) {
-    return {
-        product: state.selectedProduct,
-    };
-}
+const mapStateToProps = ( state ) => ( {
+    product: state.selectedProduct,
+} );
 
 export default connect( mapStateToProps )( ProductDetails );
