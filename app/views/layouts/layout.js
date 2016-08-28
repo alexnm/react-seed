@@ -11,6 +11,7 @@ const Layout = ( { showSpinner, children } ) => {
             <div>
                 <Link to="/">Home</Link>
                 <Link to="/products">Products</Link>
+                <Link to="/my-cart">My Cart</Link>
             </div>
             <div>
                 { spinner }
