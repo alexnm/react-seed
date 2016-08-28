@@ -3,6 +3,8 @@ import { connect } from "react-redux";
 import { fetchProduct } from "../../actions/productActions";
 import { Api } from "../../helpers";
 
+const loadProduct = Api.get( fetchProduct );
+
 const ProductDetails = React.createClass( {
     propTypes: {
         params: React.PropTypes.object,
@@ -11,12 +13,12 @@ const ProductDetails = React.createClass( {
     },
 
     statics: {
-        prerequisites: ( { params } ) => Api.get( fetchProduct, { id: params.id } ),
+        prerequisites: ( { params } ) => loadProduct( { id: params.id } ),
     },
 
     componentDidMount( ) {
         if ( this.props.product.id !== parseInt( this.props.params.id, 10 ) ) {
-            this.props.dispatch( Api.get( fetchProduct, { id: this.props.params.id } ) );
+            this.props.dispatch( loadProduct( { id: this.props.params.id } ) );
         }
     },
 

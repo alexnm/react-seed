@@ -1,13 +1,11 @@
 import React from "react";
 import Helmet from "react-helmet";
+import Dictionary from "../../dictionary";
 
-export default React.createClass( {
-    render( ) {
-        return (
-            <div>
-                <Helmet title="Welcome to awesomeness!" />
-                <h1>Welcome to React!</h1>
-            </div>
-        );
-    },
-} );
+export default ( ) => (
+    <div>
+        <Helmet title={ Dictionary.home.title } />
+        <h1>{ Dictionary.home.title }</h1>
+        <p>{ Dictionary.home.explanation }</p>
+    </div>
+);

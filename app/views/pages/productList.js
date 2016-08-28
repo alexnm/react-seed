@@ -5,13 +5,15 @@ import { fetchProducts } from "../../actions/productActions";
 import { Api } from "../../helpers";
 import { ProductEntry } from "../components";
 
+const loadProducts = Api.get( fetchProducts );
+
 const ProductList = React.createClass( {
     propTypes: {
         products: React.PropTypes.object,
     },
 
     statics: {
-        prerequisites: ( ) => Api.get( fetchProducts ),
+        prerequisites: loadProducts,
     },
 
     render( ) {

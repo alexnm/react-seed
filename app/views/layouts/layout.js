@@ -4,6 +4,7 @@ import { Link } from "react-router";
 
 const Layout = ( { showSpinner, children } ) => {
     const spinner = showSpinner ? ( <span>Loading...</span> ) : "";
+    const content = showSpinner ? "" : children;
 
     return (
         <div>
@@ -13,7 +14,7 @@ const Layout = ( { showSpinner, children } ) => {
             </div>
             <div>
                 { spinner }
-                { children }
+                { content }
             </div>
         </div>
     );
