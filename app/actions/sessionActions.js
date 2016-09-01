@@ -18,3 +18,8 @@ export const login = {
 export const logout = {
     type: Actions.LOGOUT,
 };
+
+export const setRedirectAfterLogin = ( redirectUrl ) => ( {
+    type: Actions.SET_REDIRECT_AFTER_LOGIN,
+    redirectUrl,
+} );
