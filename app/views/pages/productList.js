@@ -18,7 +18,7 @@ const ProductList = React.createClass( {
     },
 
     componentDidMount( ) {
-        this.props.dispatch( loadProducts );
+        this.props.dispatch( loadProducts( ) );
     },
 
     render( ) {
