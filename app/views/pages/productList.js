@@ -9,11 +9,16 @@ const loadProducts = Api.get( fetchProducts );
 
 const ProductList = React.createClass( {
     propTypes: {
-        products: React.PropTypes.object,
+        products: React.PropTypes.array,
+        dispatch: React.PropTypes.func,
     },
 
     statics: {
         prerequisites: loadProducts,
+    },
+
+    componentDidMount( ) {
+        this.props.dispatch( loadProducts );
     },
 
     render( ) {

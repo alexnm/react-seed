@@ -11,6 +11,7 @@ import configureStore from "../app/store";
 
 const app = express( );
 
+app.use( "/favicon.ico", express.static( "favicon.ico" ) );
 app.use( "/dist", express.static( "dist" ) );
 
 app.use( "/api", apiRoutes );
@@ -18,7 +19,7 @@ app.use( "/api", apiRoutes );
 app.use( ( req, res ) => {
     const store = configureStore( );
 
-    match( { routes: routes( store.dispatch, store.getState ), location: req.url }, ( error, redirect, props ) => {
+    match( { routes, location: req.url }, ( error, redirect, props ) => {
         fetchDataForComponents( props, store ).then( ( ) => {
             const reactDom = renderToString(
                 <Provider store={ store }>

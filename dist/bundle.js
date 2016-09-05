@@ -60,14 +60,13 @@
 
 	var _routes2 = _interopRequireDefault(_routes);
 
-	var _store = __webpack_require__(273);
+	var _store = __webpack_require__(299);
 
 	var _store2 = _interopRequireDefault(_store);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-	var store = (0, _store2.default)();
-
+	var store = (0, _store2.default)(window.INITIAL_STATE);
 	var rootHtml = _react2.default.createElement(
 	    _reactRedux.Provider,
 	    { store: store },
@@ -28390,19 +28389,25 @@
 
 	var _pages = __webpack_require__(261);
 
-	var _layout = __webpack_require__(272);
+	var _layout = __webpack_require__(296);
 
 	var _layout2 = _interopRequireDefault(_layout);
 
+	var _enhancers = __webpack_require__(297);
+
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-	exports.default = _react2.default.createElement(
+	var routes = _react2.default.createElement(
 	    _reactRouter.Route,
 	    { path: "/", component: _layout2.default },
 	    _react2.default.createElement(_reactRouter.IndexRoute, { component: _pages.Home }),
+	    _react2.default.createElement(_reactRouter.Route, { path: "/login", component: _pages.Login }),
 	    _react2.default.createElement(_reactRouter.Route, { path: "/products", component: _pages.ProductList }),
-	    _react2.default.createElement(_reactRouter.Route, { path: "/products/:id", component: _pages.ProductDetails })
+	    _react2.default.createElement(_reactRouter.Route, { path: "/products/:id", component: _pages.ProductDetails }),
+	    _react2.default.createElement(_reactRouter.Route, { path: "/my-cart", component: (0, _enhancers.withAuthentication)(_pages.Cart) })
 	);
+
+	exports.default = routes;
 
 /***/ },
 /* 261 */
@@ -28413,23 +28418,33 @@
 	Object.defineProperty(exports, "__esModule", {
 	    value: true
 	});
-	exports.ProductList = exports.ProductDetails = exports.Home = undefined;
+	exports.ProductList = exports.ProductDetails = exports.Login = exports.Home = exports.Cart = undefined;
 
-	var _home = __webpack_require__(262);
+	var _cart = __webpack_require__(262);
+
+	var _cart2 = _interopRequireDefault(_cart);
+
+	var _home = __webpack_require__(280);
 
 	var _home2 = _interopRequireDefault(_home);
 
-	var _productDetails = __webpack_require__(281);
+	var _login = __webpack_require__(282);
+
+	var _login2 = _interopRequireDefault(_login);
+
+	var _productDetails = __webpack_require__(291);
 
 	var _productDetails2 = _interopRequireDefault(_productDetails);
 
-	var _productList = __webpack_require__(263);
+	var _productList = __webpack_require__(293);
 
 	var _productList2 = _interopRequireDefault(_productList);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+	exports.Cart = _cart2.default;
 	exports.Home = _home2.default;
+	exports.Login = _login2.default;
 	exports.ProductDetails = _productDetails2.default;
 	exports.ProductList = _productList2.default;
 
@@ -28447,174 +28462,1127 @@
 
 	var _react2 = _interopRequireDefault(_react);
 
+	var _reactRedux = __webpack_require__(172);
+
+	var _reactHelmet = __webpack_require__(263);
+
+	var _reactHelmet2 = _interopRequireDefault(_reactHelmet);
+
+	var _helpers = __webpack_require__(273);
+
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-	exports.default = _react2.default.createClass({
-	    displayName: "home",
+	var Cart = _react2.default.createClass({
+	    displayName: "Cart",
+
+	    propTypes: {},
+
 	    render: function render() {
 	        return _react2.default.createElement(
 	            "div",
 	            null,
+	            _react2.default.createElement(_reactHelmet2.default, { title: "My shopping cart" }),
 	            _react2.default.createElement(
 	                "h1",
 	                null,
-	                "Welcome to React!"
+	                "My shopping cart"
 	            )
 	        );
 	    }
 	});
+
+	exports.default = (0, _reactRedux.connect)(null)(Cart);
 
 /***/ },
 /* 263 */
 /***/ function(module, exports, __webpack_require__) {
 
-	"use strict";
-
 	Object.defineProperty(exports, "__esModule", {
 	    value: true
 	});
+
+	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+
+	var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; desc = parent = undefined; continue _function; } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
+
+	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+	function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
 	var _react = __webpack_require__(1);
 
 	var _react2 = _interopRequireDefault(_react);
 
-	var _reactRouter = __webpack_require__(198);
+	var _reactSideEffect = __webpack_require__(264);
 
-	var _reactRedux = __webpack_require__(172);
+	var _reactSideEffect2 = _interopRequireDefault(_reactSideEffect);
 
-	var _productActions = __webpack_require__(264);
+	var _deepEqual = __webpack_require__(267);
 
-	var _helpers = __webpack_require__(266);
+	var _deepEqual2 = _interopRequireDefault(_deepEqual);
 
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	var _objectAssign = __webpack_require__(270);
 
-	var ProductList = _react2.default.createClass({
-	    displayName: "ProductList",
-	    componentDidMount: function componentDidMount() {
-	        this.props.dispatch(_helpers.Api.get(_productActions.fetchProducts));
-	    },
-	    productEntry: function productEntry(product, index) {
-	        return _react2.default.createElement(
-	            "div",
-	            { key: index },
-	            _react2.default.createElement(
-	                _reactRouter.Link,
-	                { to: "/products/" + product.id },
-	                product.name
-	            ),
-	            " - ",
-	            _react2.default.createElement(
-	                "span",
-	                null,
-	                product.price
-	            )
-	        );
-	    },
-	    render: function render() {
-	        var products = this.props.products;
-	        return _react2.default.createElement(
-	            "div",
-	            null,
-	            _react2.default.createElement(
-	                "h1",
-	                null,
-	                "Product List!"
-	            ),
-	            products.map(this.productEntry)
-	        );
+	var _objectAssign2 = _interopRequireDefault(_objectAssign);
+
+	var _HelmetConstantsJs = __webpack_require__(271);
+
+	var _PlainComponent = __webpack_require__(272);
+
+	var _PlainComponent2 = _interopRequireDefault(_PlainComponent);
+
+	var HELMET_ATTRIBUTE = "data-react-helmet";
+
+	var encodeSpecialCharacters = function encodeSpecialCharacters(str) {
+	    return String(str).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#x27;");
+	};
+
+	var getInnermostProperty = function getInnermostProperty(propsList, property) {
+	    var reversedPropsList = [].concat(propsList).reverse();
+
+	    for (var i = 0; i < reversedPropsList.length; i++) {
+	        var props = reversedPropsList[i];
+
+	        if (props[property]) {
+	            return props[property];
+	        }
 	    }
-	});
 
-	function mapStateToProps(state) {
+	    return null;
+	};
+
+	var getTitleFromPropsList = function getTitleFromPropsList(propsList) {
+	    var innermostTitle = getInnermostProperty(propsList, "title");
+	    var innermostTemplate = getInnermostProperty(propsList, "titleTemplate");
+
+	    if (innermostTemplate && innermostTitle) {
+	        return innermostTemplate.replace(/\%s/g, innermostTitle);
+	    }
+
+	    var innermostDefaultTitle = getInnermostProperty(propsList, "defaultTitle");
+
+	    return innermostTitle || innermostDefaultTitle || "";
+	};
+
+	var getOnChangeClientState = function getOnChangeClientState(propsList) {
+	    return getInnermostProperty(propsList, "onChangeClientState") || function () {};
+	};
+
+	var getHtmlAttributesFromPropsList = function getHtmlAttributesFromPropsList(propsList) {
+	    return propsList.filter(function (props) {
+	        return typeof props[_HelmetConstantsJs.TAG_NAMES.HTML] !== "undefined";
+	    }).map(function (props) {
+	        return props[_HelmetConstantsJs.TAG_NAMES.HTML];
+	    }).reduce(function (html, current) {
+	        return _extends({}, html, current);
+	    }, {});
+	};
+
+	var getBaseTagFromPropsList = function getBaseTagFromPropsList(primaryAttributes, propsList) {
+	    return propsList.filter(function (props) {
+	        return typeof props[_HelmetConstantsJs.TAG_NAMES.BASE] !== "undefined";
+	    }).map(function (props) {
+	        return props[_HelmetConstantsJs.TAG_NAMES.BASE];
+	    }).reverse().reduce(function (innermostBaseTag, tag) {
+	        if (!innermostBaseTag.length) {
+	            var keys = Object.keys(tag);
+
+	            for (var i = 0; i < keys.length; i++) {
+	                var attributeKey = keys[i];
+	                var lowerCaseAttributeKey = attributeKey.toLowerCase();
+
+	                if (primaryAttributes.indexOf(lowerCaseAttributeKey) !== -1) {
+	                    return innermostBaseTag.concat(tag);
+	                }
+	            }
+	        }
+
+	        return innermostBaseTag;
+	    }, []);
+	};
+
+	var getTagsFromPropsList = function getTagsFromPropsList(tagName, primaryAttributes, propsList) {
+	    // Calculate list of tags, giving priority innermost component (end of the propslist)
+	    var approvedSeenTags = {};
+
+	    var tagList = propsList.filter(function (props) {
+	        return typeof props[tagName] !== "undefined";
+	    }).map(function (props) {
+	        return props[tagName];
+	    }).reverse().reduce(function (approvedTags, instanceTags) {
+	        var instanceSeenTags = {};
+
+	        instanceTags.filter(function (tag) {
+	            var primaryAttributeKey = undefined;
+	            var keys = Object.keys(tag);
+	            for (var i = 0; i < keys.length; i++) {
+	                var attributeKey = keys[i];
+	                var lowerCaseAttributeKey = attributeKey.toLowerCase();
+
+	                // Special rule with link tags, since rel and href are both primary tags, rel takes priority
+	                if (primaryAttributes.indexOf(lowerCaseAttributeKey) !== -1 && !(primaryAttributeKey === _HelmetConstantsJs.TAG_PROPERTIES.REL && tag[primaryAttributeKey].toLowerCase() === "canonical") && !(lowerCaseAttributeKey === _HelmetConstantsJs.TAG_PROPERTIES.REL && tag[lowerCaseAttributeKey].toLowerCase() === "stylesheet")) {
+	                    primaryAttributeKey = lowerCaseAttributeKey;
+	                }
+	                // Special case for innerHTML which doesn't work lowercased
+	                if (primaryAttributes.indexOf(attributeKey) !== -1 && (attributeKey === _HelmetConstantsJs.TAG_PROPERTIES.INNER_HTML || attributeKey === _HelmetConstantsJs.TAG_PROPERTIES.CSS_TEXT)) {
+	                    primaryAttributeKey = attributeKey;
+	                }
+	            }
+
+	            if (!primaryAttributeKey) {
+	                return false;
+	            }
+
+	            var value = tag[primaryAttributeKey].toLowerCase();
+
+	            if (!approvedSeenTags[primaryAttributeKey]) {
+	                approvedSeenTags[primaryAttributeKey] = {};
+	            }
+
+	            if (!instanceSeenTags[primaryAttributeKey]) {
+	                instanceSeenTags[primaryAttributeKey] = {};
+	            }
+
+	            if (!approvedSeenTags[primaryAttributeKey][value]) {
+	                instanceSeenTags[primaryAttributeKey][value] = true;
+	                return true;
+	            }
+
+	            return false;
+	        }).reverse().forEach(function (tag) {
+	            return approvedTags.push(tag);
+	        });
+
+	        // Update seen tags with tags from this instance
+	        var keys = Object.keys(instanceSeenTags);
+	        for (var i = 0; i < keys.length; i++) {
+	            var attributeKey = keys[i];
+	            var tagUnion = (0, _objectAssign2["default"])({}, approvedSeenTags[attributeKey], instanceSeenTags[attributeKey]);
+
+	            approvedSeenTags[attributeKey] = tagUnion;
+	        }
+
+	        return approvedTags;
+	    }, []).reverse();
+
+	    return tagList;
+	};
+
+	var updateTitle = function updateTitle(title) {
+	    document.title = title || document.title;
+	};
+
+	var updateHtmlAttributes = function updateHtmlAttributes(attributes) {
+	    var htmlTag = document.getElementsByTagName("html")[0];
+	    var helmetAttributeString = htmlTag.getAttribute(HELMET_ATTRIBUTE);
+	    var helmetAttributes = helmetAttributeString ? helmetAttributeString.split(",") : [];
+	    var attributesToRemove = [].concat(helmetAttributes);
+	    var attributeKeys = Object.keys(attributes);
+
+	    for (var i = 0; i < attributeKeys.length; i++) {
+	        var attribute = attributeKeys[i];
+	        var value = attributes[attribute] || "";
+	        htmlTag.setAttribute(attribute, value);
+
+	        if (helmetAttributes.indexOf(attribute) === -1) {
+	            helmetAttributes.push(attribute);
+	        }
+
+	        var indexToSave = attributesToRemove.indexOf(attribute);
+	        if (indexToSave !== -1) {
+	            attributesToRemove.splice(indexToSave, 1);
+	        }
+	    }
+
+	    for (var i = attributesToRemove.length - 1; i >= 0; i--) {
+	        htmlTag.removeAttribute(attributesToRemove[i]);
+	    }
+
+	    if (helmetAttributes.length === attributesToRemove.length) {
+	        htmlTag.removeAttribute(HELMET_ATTRIBUTE);
+	    } else {
+	        htmlTag.setAttribute(HELMET_ATTRIBUTE, helmetAttributes.join(","));
+	    }
+	};
+
+	var updateTags = function updateTags(type, tags) {
+	    var headElement = document.head || document.querySelector("head");
+	    var tagNodes = headElement.querySelectorAll(type + "[" + HELMET_ATTRIBUTE + "]");
+	    var oldTags = Array.prototype.slice.call(tagNodes);
+	    var newTags = [];
+	    var indexToDelete = undefined;
+
+	    if (tags && tags.length) {
+	        tags.forEach(function (tag) {
+	            var newElement = document.createElement(type);
+
+	            for (var attribute in tag) {
+	                if (tag.hasOwnProperty(attribute)) {
+	                    if (attribute === "innerHTML") {
+	                        newElement.innerHTML = tag.innerHTML;
+	                    } else if (attribute === "cssText") {
+	                        if (newElement.styleSheet) {
+	                            newElement.styleSheet.cssText = tag.cssText;
+	                        } else {
+	                            newElement.appendChild(document.createTextNode(tag.cssText));
+	                        }
+	                    } else {
+	                        var value = typeof tag[attribute] === "undefined" ? "" : tag[attribute];
+	                        newElement.setAttribute(attribute, value);
+	                    }
+	                }
+	            }
+
+	            newElement.setAttribute(HELMET_ATTRIBUTE, "true");
+
+	            // Remove a duplicate tag from domTagstoRemove, so it isn't cleared.
+	            if (oldTags.some(function (existingTag, index) {
+	                indexToDelete = index;
+	                return newElement.isEqualNode(existingTag);
+	            })) {
+	                oldTags.splice(indexToDelete, 1);
+	            } else {
+	                newTags.push(newElement);
+	            }
+	        });
+	    }
+
+	    oldTags.forEach(function (tag) {
+	        return tag.parentNode.removeChild(tag);
+	    });
+	    newTags.forEach(function (tag) {
+	        return headElement.appendChild(tag);
+	    });
+
 	    return {
-	        products: state.products
+	        oldTags: oldTags,
+	        newTags: newTags
 	    };
-	}
+	};
 
-	exports.default = (0, _reactRedux.connect)(mapStateToProps)(ProductList);
+	var generateHtmlAttributesAsString = function generateHtmlAttributesAsString(attributes) {
+	    var keys = Object.keys(attributes);
+	    var attributeString = "";
+
+	    for (var i = 0; i < keys.length; i++) {
+	        var attribute = keys[i];
+	        var attr = typeof attributes[attribute] !== "undefined" ? attribute + "=\"" + attributes[attribute] + "\"" : "" + attribute;
+	        attributeString += attr + " ";
+	    }
+
+	    return attributeString.trim();
+	};
+
+	var generateTitleAsString = function generateTitleAsString(type, title) {
+	    var stringifiedMarkup = "<" + type + " " + HELMET_ATTRIBUTE + "=\"true\">" + encodeSpecialCharacters(title) + "</" + type + ">";
+
+	    return stringifiedMarkup;
+	};
+
+	var generateTagsAsString = function generateTagsAsString(type, tags) {
+	    var stringifiedMarkup = tags.map(function (tag) {
+	        var attributeHtml = Object.keys(tag).filter(function (attribute) {
+	            return !(attribute === "innerHTML" || attribute === "cssText");
+	        }).map(function (attribute) {
+	            if (typeof tag[attribute] === "undefined") {
+	                return attribute;
+	            }
+
+	            var encodedValue = encodeSpecialCharacters(tag[attribute]);
+	            return attribute + "=\"" + encodedValue + "\"";
+	        }).join(" ").trim();
+
+	        var tagContent = tag.innerHTML || tag.cssText || "";
+
+	        return "<" + type + " " + HELMET_ATTRIBUTE + "=\"true\" " + attributeHtml + (type === _HelmetConstantsJs.TAG_NAMES.SCRIPT || type === _HelmetConstantsJs.TAG_NAMES.STYLE ? ">" + tagContent + "</" + type + ">" : "/>");
+	    }).join("");
+
+	    return stringifiedMarkup;
+	};
+
+	var generateTitleAsReactComponent = function generateTitleAsReactComponent(type, title) {
+	    // assigning into an array to define toString function on it
+	    var component = [_react2["default"].createElement(_HelmetConstantsJs.TAG_NAMES.TITLE, _defineProperty({
+	        key: title
+	    }, HELMET_ATTRIBUTE, true), title)];
+
+	    return component;
+	};
+
+	var generateTagsAsReactComponent = function generateTagsAsReactComponent(type, tags) {
+	    /* eslint-disable react/display-name */
+	    var component = tags.map(function (tag, i) {
+	        var mappedTag = _defineProperty({
+	            key: i
+	        }, HELMET_ATTRIBUTE, true);
+
+	        Object.keys(tag).forEach(function (attribute) {
+	            var mappedAttribute = _HelmetConstantsJs.REACT_TAG_MAP[attribute] || attribute;
+
+	            if (mappedAttribute === "innerHTML" || mappedAttribute === "cssText") {
+	                var content = tag.innerHTML || tag.cssText;
+	                mappedTag.dangerouslySetInnerHTML = { __html: content };
+	            } else {
+	                mappedTag[mappedAttribute] = tag[attribute];
+	            }
+	        });
+
+	        return _react2["default"].createElement(type, mappedTag);
+	    });
+
+	    return component;
+	    /* eslint-enable react/display-name */
+	};
+
+	var getMethodsForTag = function getMethodsForTag(type, tags) {
+	    switch (type) {
+	        case _HelmetConstantsJs.TAG_NAMES.TITLE:
+	            return {
+	                toComponent: function toComponent() {
+	                    return generateTitleAsReactComponent(type, tags);
+	                },
+	                toString: function toString() {
+	                    return generateTitleAsString(type, tags);
+	                }
+	            };
+	        case _HelmetConstantsJs.TAG_NAMES.HTML:
+	            return {
+	                toComponent: function toComponent() {
+	                    return tags;
+	                },
+	                toString: function toString() {
+	                    return generateHtmlAttributesAsString(tags);
+	                }
+	            };
+	        default:
+	            return {
+	                toComponent: function toComponent() {
+	                    return generateTagsAsReactComponent(type, tags);
+	                },
+	                toString: function toString() {
+	                    return generateTagsAsString(type, tags);
+	                }
+	            };
+	    }
+	};
+
+	var mapStateOnServer = function mapStateOnServer(_ref) {
+	    var htmlAttributes = _ref.htmlAttributes;
+	    var title = _ref.title;
+	    var baseTag = _ref.baseTag;
+	    var metaTags = _ref.metaTags;
+	    var linkTags = _ref.linkTags;
+	    var scriptTags = _ref.scriptTags;
+	    var styleTags = _ref.styleTags;
+	    return {
+	        htmlAttributes: getMethodsForTag(_HelmetConstantsJs.TAG_NAMES.HTML, htmlAttributes),
+	        title: getMethodsForTag(_HelmetConstantsJs.TAG_NAMES.TITLE, title),
+	        base: getMethodsForTag(_HelmetConstantsJs.TAG_NAMES.BASE, baseTag),
+	        meta: getMethodsForTag(_HelmetConstantsJs.TAG_NAMES.META, metaTags),
+	        link: getMethodsForTag(_HelmetConstantsJs.TAG_NAMES.LINK, linkTags),
+	        script: getMethodsForTag(_HelmetConstantsJs.TAG_NAMES.SCRIPT, scriptTags),
+	        style: getMethodsForTag(_HelmetConstantsJs.TAG_NAMES.STYLE, styleTags)
+	    };
+	};
+
+	var Helmet = function Helmet(Component) {
+	    /* eslint-disable react/no-multi-comp */
+
+	    var HelmetWrapper = (function (_React$Component) {
+	        _inherits(HelmetWrapper, _React$Component);
+
+	        function HelmetWrapper() {
+	            _classCallCheck(this, HelmetWrapper);
+
+	            _get(Object.getPrototypeOf(HelmetWrapper.prototype), "constructor", this).apply(this, arguments);
+	        }
+
+	        /* eslint-enable react/no-multi-comp */
+
+	        _createClass(HelmetWrapper, [{
+	            key: "shouldComponentUpdate",
+	            value: function shouldComponentUpdate(nextProps) {
+	                return !(0, _deepEqual2["default"])(this.props, nextProps);
+	            }
+
+	            // Component.peek comes from react-side-effect:
+	            // For testing, you may use a static peek() method available on the returned component.
+	            // It lets you get the current state without resetting the mounted instance stack.
+	            // Don’t use it for anything other than testing.
+	        }, {
+	            key: "render",
+	            value: function render() {
+	                return _react2["default"].createElement(Component, this.props);
+	            }
+	        }], [{
+	            key: "propTypes",
+
+	            /**
+	             * @param {Object} htmlAttributes: {"lang": "en", "amp": undefined}
+	             * @param {String} title: "Title"
+	             * @param {String} defaultTitle: "Default Title"
+	             * @param {String} titleTemplate: "MySite.com - %s"
+	             * @param {Object} base: {"target": "_blank", "href": "http://mysite.com/"}
+	             * @param {Array} meta: [{"name": "description", "content": "Test description"}]
+	             * @param {Array} link: [{"rel": "canonical", "href": "http://mysite.com/example"}]
+	             * @param {Array} script: [{"type": "text/javascript", "src": "http://mysite.com/js/test.js"}]
+	             * @param {Array} style: [{"type": "text/css", "cssText": "div{ display: block; color: blue; }"}]
+	             * @param {Function} onChangeClientState: "(newState) => console.log(newState)"
+	             */
+	            value: {
+	                htmlAttributes: _react2["default"].PropTypes.object,
+	                title: _react2["default"].PropTypes.string,
+	                defaultTitle: _react2["default"].PropTypes.string,
+	                titleTemplate: _react2["default"].PropTypes.string,
+	                base: _react2["default"].PropTypes.object,
+	                meta: _react2["default"].PropTypes.arrayOf(_react2["default"].PropTypes.object),
+	                link: _react2["default"].PropTypes.arrayOf(_react2["default"].PropTypes.object),
+	                script: _react2["default"].PropTypes.arrayOf(_react2["default"].PropTypes.object),
+	                style: _react2["default"].PropTypes.arrayOf(_react2["default"].PropTypes.object),
+	                onChangeClientState: _react2["default"].PropTypes.func
+	            },
+	            enumerable: true
+	        }, {
+	            key: "peek",
+	            value: Component.peek,
+	            enumerable: true
+	        }, {
+	            key: "rewind",
+	            value: function value() {
+	                var mappedState = Component.rewind();
+	                if (!mappedState) {
+	                    // provide fallback if mappedState is undefined
+	                    mappedState = mapStateOnServer({
+	                        htmlAttributes: [],
+	                        title: "",
+	                        baseTag: [],
+	                        metaTags: [],
+	                        linkTags: [],
+	                        scriptTags: [],
+	                        styleTags: []
+	                    });
+	                }
+
+	                return mappedState;
+	            },
+	            enumerable: true
+	        }, {
+	            key: "canUseDOM",
+	            set: function set(canUseDOM) {
+	                Component.canUseDOM = canUseDOM;
+	            }
+	        }]);
+
+	        return HelmetWrapper;
+	    })(_react2["default"].Component);
+
+	    return HelmetWrapper;
+	};
+
+	var reducePropsToState = function reducePropsToState(propsList) {
+	    return {
+	        htmlAttributes: getHtmlAttributesFromPropsList(propsList),
+	        title: getTitleFromPropsList(propsList),
+	        baseTag: getBaseTagFromPropsList([_HelmetConstantsJs.TAG_PROPERTIES.HREF], propsList),
+	        metaTags: getTagsFromPropsList(_HelmetConstantsJs.TAG_NAMES.META, [_HelmetConstantsJs.TAG_PROPERTIES.NAME, _HelmetConstantsJs.TAG_PROPERTIES.CHARSET, _HelmetConstantsJs.TAG_PROPERTIES.HTTPEQUIV, _HelmetConstantsJs.TAG_PROPERTIES.PROPERTY], propsList),
+	        linkTags: getTagsFromPropsList(_HelmetConstantsJs.TAG_NAMES.LINK, [_HelmetConstantsJs.TAG_PROPERTIES.REL, _HelmetConstantsJs.TAG_PROPERTIES.HREF], propsList),
+	        scriptTags: getTagsFromPropsList(_HelmetConstantsJs.TAG_NAMES.SCRIPT, [_HelmetConstantsJs.TAG_PROPERTIES.SRC, _HelmetConstantsJs.TAG_PROPERTIES.INNER_HTML], propsList),
+	        styleTags: getTagsFromPropsList(_HelmetConstantsJs.TAG_NAMES.STYLE, [_HelmetConstantsJs.TAG_PROPERTIES.CSS_TEXT], propsList),
+	        onChangeClientState: getOnChangeClientState(propsList)
+	    };
+	};
+
+	var handleClientStateChange = function handleClientStateChange(newState) {
+	    var htmlAttributes = newState.htmlAttributes;
+	    var title = newState.title;
+	    var baseTag = newState.baseTag;
+	    var metaTags = newState.metaTags;
+	    var linkTags = newState.linkTags;
+	    var scriptTags = newState.scriptTags;
+	    var styleTags = newState.styleTags;
+	    var onChangeClientState = newState.onChangeClientState;
+
+	    updateHtmlAttributes(htmlAttributes);
+
+	    updateTitle(title);
+
+	    var tagUpdates = {
+	        baseTag: updateTags(_HelmetConstantsJs.TAG_NAMES.BASE, baseTag),
+	        metaTags: updateTags(_HelmetConstantsJs.TAG_NAMES.META, metaTags),
+	        linkTags: updateTags(_HelmetConstantsJs.TAG_NAMES.LINK, linkTags),
+	        scriptTags: updateTags(_HelmetConstantsJs.TAG_NAMES.SCRIPT, scriptTags),
+	        styleTags: updateTags(_HelmetConstantsJs.TAG_NAMES.STYLE, styleTags)
+	    };
+
+	    var addedTags = {};
+	    var removedTags = {};
+
+	    Object.keys(tagUpdates).forEach(function (tagType) {
+	        var _tagUpdates$tagType = tagUpdates[tagType];
+	        var newTags = _tagUpdates$tagType.newTags;
+	        var oldTags = _tagUpdates$tagType.oldTags;
+
+	        if (newTags.length) {
+	            addedTags[tagType] = newTags;
+	        }
+	        if (oldTags.length) {
+	            removedTags[tagType] = tagUpdates[tagType].oldTags;
+	        }
+	    });
+
+	    onChangeClientState(newState, addedTags, removedTags);
+	};
+
+	var SideEffect = (0, _reactSideEffect2["default"])(reducePropsToState, handleClientStateChange, mapStateOnServer);
+
+	// PlainComponent is used to be a blank component decorated by react-side-effect
+	exports["default"] = Helmet(SideEffect(_PlainComponent2["default"]));
+	module.exports = exports["default"];
 
 /***/ },
 /* 264 */
 /***/ function(module, exports, __webpack_require__) {
 
-	"use strict";
+	'use strict';
 
-	Object.defineProperty(exports, "__esModule", {
-	    value: true
-	});
-	exports.fetchProducts = exports.fetchProduct = undefined;
-	exports.addToCart = addToCart;
+	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
 
-	var _actionIdentifiers = __webpack_require__(265);
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
-	function addToCart(product) {
-	    return {
-	        type: _actionIdentifiers.ADD_TO_CART,
-	        product: product
-	    };
-	}
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
 
-	var fetchProduct = exports.fetchProduct = {
-	    name: _actionIdentifiers.GET_PRODUCT,
-	    started: function started() {
-	        return {
-	            type: _actionIdentifiers.GET_PRODUCT
-	        };
-	    },
-	    completed: function completed(response) {
-	        return {
-	            type: _actionIdentifiers.GET_PRODUCT_COMPLETED,
-	            product: response.product
-	        };
-	    },
-	    failed: function failed() {
-	        return {
-	            type: _actionIdentifiers.GET_PRODUCT_FAILED
-	        };
+	function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+	var _react = __webpack_require__(1);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	var _fbjsLibExecutionEnvironment = __webpack_require__(265);
+
+	var _fbjsLibExecutionEnvironment2 = _interopRequireDefault(_fbjsLibExecutionEnvironment);
+
+	var _fbjsLibShallowEqual = __webpack_require__(266);
+
+	var _fbjsLibShallowEqual2 = _interopRequireDefault(_fbjsLibShallowEqual);
+
+	module.exports = function withSideEffect(reducePropsToState, handleStateChangeOnClient, mapStateOnServer) {
+	  if (typeof reducePropsToState !== 'function') {
+	    throw new Error('Expected reducePropsToState to be a function.');
+	  }
+	  if (typeof handleStateChangeOnClient !== 'function') {
+	    throw new Error('Expected handleStateChangeOnClient to be a function.');
+	  }
+	  if (typeof mapStateOnServer !== 'undefined' && typeof mapStateOnServer !== 'function') {
+	    throw new Error('Expected mapStateOnServer to either be undefined or a function.');
+	  }
+
+	  function getDisplayName(WrappedComponent) {
+	    return WrappedComponent.displayName || WrappedComponent.name || 'Component';
+	  }
+
+	  return function wrap(WrappedComponent) {
+	    if (typeof WrappedComponent !== 'function') {
+	      throw new Error('Expected WrappedComponent to be a React component.');
 	    }
-	};
 
-	var fetchProducts = exports.fetchProducts = {
-	    name: _actionIdentifiers.GET_PRODUCTS,
-	    started: function started() {
-	        return {
-	            type: _actionIdentifiers.GET_PRODUCTS
-	        };
-	    },
-	    completed: function completed(response) {
-	        return {
-	            type: _actionIdentifiers.GET_PRODUCTS_COMPLETED,
-	            products: response.products
-	        };
-	    },
-	    failed: function failed() {
-	        return {
-	            type: _actionIdentifiers.GET_PRODUCTS_FAILED
-	        };
+	    var mountedInstances = [];
+	    var state = undefined;
+
+	    function emitChange() {
+	      state = reducePropsToState(mountedInstances.map(function (instance) {
+	        return instance.props;
+	      }));
+
+	      if (SideEffect.canUseDOM) {
+	        handleStateChangeOnClient(state);
+	      } else if (mapStateOnServer) {
+	        state = mapStateOnServer(state);
+	      }
 	    }
+
+	    var SideEffect = (function (_Component) {
+	      _inherits(SideEffect, _Component);
+
+	      function SideEffect() {
+	        _classCallCheck(this, SideEffect);
+
+	        _Component.apply(this, arguments);
+	      }
+
+	      SideEffect.peek = function peek() {
+	        return state;
+	      };
+
+	      SideEffect.rewind = function rewind() {
+	        if (SideEffect.canUseDOM) {
+	          throw new Error('You may ony call rewind() on the server. Call peek() to read the current state.');
+	        }
+
+	        var recordedState = state;
+	        state = undefined;
+	        mountedInstances = [];
+	        return recordedState;
+	      };
+
+	      SideEffect.prototype.shouldComponentUpdate = function shouldComponentUpdate(nextProps) {
+	        return !_fbjsLibShallowEqual2['default'](nextProps, this.props);
+	      };
+
+	      SideEffect.prototype.componentWillMount = function componentWillMount() {
+	        mountedInstances.push(this);
+	        emitChange();
+	      };
+
+	      SideEffect.prototype.componentDidUpdate = function componentDidUpdate() {
+	        emitChange();
+	      };
+
+	      SideEffect.prototype.componentWillUnmount = function componentWillUnmount() {
+	        var index = mountedInstances.indexOf(this);
+	        mountedInstances.splice(index, 1);
+	        emitChange();
+	      };
+
+	      SideEffect.prototype.render = function render() {
+	        return _react2['default'].createElement(WrappedComponent, this.props);
+	      };
+
+	      _createClass(SideEffect, null, [{
+	        key: 'displayName',
+
+	        // Try to use displayName of wrapped component
+	        value: 'SideEffect(' + getDisplayName(WrappedComponent) + ')',
+
+	        // Expose canUseDOM so tests can monkeypatch it
+	        enumerable: true
+	      }, {
+	        key: 'canUseDOM',
+	        value: _fbjsLibExecutionEnvironment2['default'].canUseDOM,
+	        enumerable: true
+	      }]);
+
+	      return SideEffect;
+	    })(_react.Component);
+
+	    return SideEffect;
+	  };
 	};
 
 /***/ },
 /* 265 */
 /***/ function(module, exports) {
 
-	"use strict";
+	/**
+	 * Copyright 2013-2015, Facebook, Inc.
+	 * All rights reserved.
+	 *
+	 * This source code is licensed under the BSD-style license found in the
+	 * LICENSE file in the root directory of this source tree. An additional grant
+	 * of patent rights can be found in the PATENTS file in the same directory.
+	 *
+	 * @providesModule ExecutionEnvironment
+	 */
 
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-	var ADD_TO_CART = exports.ADD_TO_CART = "ADD_TO_CART";
-	var API_CALL_STARTED = exports.API_CALL_STARTED = "API_CALL_STARTED";
-	var API_CALL_ENDED = exports.API_CALL_ENDED = "API_CALL_ENDED";
-	var GET_PRODUCT = exports.GET_PRODUCT = "GET_PRODUCT";
-	var GET_PRODUCT_COMPLETED = exports.GET_PRODUCT_COMPLETED = "GET_PRODUCT_COMPLETED";
-	var GET_PRODUCT_FAILED = exports.GET_PRODUCT_FAILED = "GET_PRODUCT_FAILED";
-	var GET_PRODUCTS = exports.GET_PRODUCTS = "GET_PRODUCTS";
-	var GET_PRODUCTS_COMPLETED = exports.GET_PRODUCTS_COMPLETED = "GET_PRODUCTS_COMPLETED";
-	var GET_PRODUCTS_FAILED = exports.GET_PRODUCTS_FAILED = "GET_PRODUCTS_FAILED";
+	'use strict';
+
+	var canUseDOM = !!(typeof window !== 'undefined' && window.document && window.document.createElement);
+
+	/**
+	 * Simple, lightweight module assisting with the detection and context of
+	 * Worker. Helps avoid circular dependencies and allows code to reason about
+	 * whether or not they are in a Worker, even if they never include the main
+	 * `ReactWorker` dependency.
+	 */
+	var ExecutionEnvironment = {
+
+	  canUseDOM: canUseDOM,
+
+	  canUseWorkers: typeof Worker !== 'undefined',
+
+	  canUseEventListeners: canUseDOM && !!(window.addEventListener || window.attachEvent),
+
+	  canUseViewport: canUseDOM && !!window.screen,
+
+	  isInWorker: !canUseDOM // For now, this is true - might change in the future.
+
+	};
+
+	module.exports = ExecutionEnvironment;
 
 /***/ },
 /* 266 */
+/***/ function(module, exports) {
+
+	/**
+	 * Copyright 2013-2015, Facebook, Inc.
+	 * All rights reserved.
+	 *
+	 * This source code is licensed under the BSD-style license found in the
+	 * LICENSE file in the root directory of this source tree. An additional grant
+	 * of patent rights can be found in the PATENTS file in the same directory.
+	 *
+	 * @providesModule shallowEqual
+	 * @typechecks
+	 * 
+	 */
+
+	'use strict';
+
+	var hasOwnProperty = Object.prototype.hasOwnProperty;
+
+	/**
+	 * Performs equality by iterating through keys on an object and returning false
+	 * when any key has values which are not strictly equal between the arguments.
+	 * Returns true when the values of all keys are strictly equal.
+	 */
+	function shallowEqual(objA, objB) {
+	  if (objA === objB) {
+	    return true;
+	  }
+
+	  if (typeof objA !== 'object' || objA === null || typeof objB !== 'object' || objB === null) {
+	    return false;
+	  }
+
+	  var keysA = Object.keys(objA);
+	  var keysB = Object.keys(objB);
+
+	  if (keysA.length !== keysB.length) {
+	    return false;
+	  }
+
+	  // Test for A's keys different from B.
+	  var bHasOwnProperty = hasOwnProperty.bind(objB);
+	  for (var i = 0; i < keysA.length; i++) {
+	    if (!bHasOwnProperty(keysA[i]) || objA[keysA[i]] !== objB[keysA[i]]) {
+	      return false;
+	    }
+	  }
+
+	  return true;
+	}
+
+	module.exports = shallowEqual;
+
+/***/ },
+/* 267 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var pSlice = Array.prototype.slice;
+	var objectKeys = __webpack_require__(268);
+	var isArguments = __webpack_require__(269);
+
+	var deepEqual = module.exports = function (actual, expected, opts) {
+	  if (!opts) opts = {};
+	  // 7.1. All identical values are equivalent, as determined by ===.
+	  if (actual === expected) {
+	    return true;
+
+	  } else if (actual instanceof Date && expected instanceof Date) {
+	    return actual.getTime() === expected.getTime();
+
+	  // 7.3. Other pairs that do not both pass typeof value == 'object',
+	  // equivalence is determined by ==.
+	  } else if (!actual || !expected || typeof actual != 'object' && typeof expected != 'object') {
+	    return opts.strict ? actual === expected : actual == expected;
+
+	  // 7.4. For all other Object pairs, including Array objects, equivalence is
+	  // determined by having the same number of owned properties (as verified
+	  // with Object.prototype.hasOwnProperty.call), the same set of keys
+	  // (although not necessarily the same order), equivalent values for every
+	  // corresponding key, and an identical 'prototype' property. Note: this
+	  // accounts for both named and indexed properties on Arrays.
+	  } else {
+	    return objEquiv(actual, expected, opts);
+	  }
+	}
+
+	function isUndefinedOrNull(value) {
+	  return value === null || value === undefined;
+	}
+
+	function isBuffer (x) {
+	  if (!x || typeof x !== 'object' || typeof x.length !== 'number') return false;
+	  if (typeof x.copy !== 'function' || typeof x.slice !== 'function') {
+	    return false;
+	  }
+	  if (x.length > 0 && typeof x[0] !== 'number') return false;
+	  return true;
+	}
+
+	function objEquiv(a, b, opts) {
+	  var i, key;
+	  if (isUndefinedOrNull(a) || isUndefinedOrNull(b))
+	    return false;
+	  // an identical 'prototype' property.
+	  if (a.prototype !== b.prototype) return false;
+	  //~~~I've managed to break Object.keys through screwy arguments passing.
+	  //   Converting to array solves the problem.
+	  if (isArguments(a)) {
+	    if (!isArguments(b)) {
+	      return false;
+	    }
+	    a = pSlice.call(a);
+	    b = pSlice.call(b);
+	    return deepEqual(a, b, opts);
+	  }
+	  if (isBuffer(a)) {
+	    if (!isBuffer(b)) {
+	      return false;
+	    }
+	    if (a.length !== b.length) return false;
+	    for (i = 0; i < a.length; i++) {
+	      if (a[i] !== b[i]) return false;
+	    }
+	    return true;
+	  }
+	  try {
+	    var ka = objectKeys(a),
+	        kb = objectKeys(b);
+	  } catch (e) {//happens when one is a string literal and the other isn't
+	    return false;
+	  }
+	  // having the same number of owned properties (keys incorporates
+	  // hasOwnProperty)
+	  if (ka.length != kb.length)
+	    return false;
+	  //the same set of keys (although not necessarily the same order),
+	  ka.sort();
+	  kb.sort();
+	  //~~~cheap key test
+	  for (i = ka.length - 1; i >= 0; i--) {
+	    if (ka[i] != kb[i])
+	      return false;
+	  }
+	  //equivalent values for every corresponding key, and
+	  //~~~possibly expensive deep test
+	  for (i = ka.length - 1; i >= 0; i--) {
+	    key = ka[i];
+	    if (!deepEqual(a[key], b[key], opts)) return false;
+	  }
+	  return typeof a === typeof b;
+	}
+
+
+/***/ },
+/* 268 */
+/***/ function(module, exports) {
+
+	exports = module.exports = typeof Object.keys === 'function'
+	  ? Object.keys : shim;
+
+	exports.shim = shim;
+	function shim (obj) {
+	  var keys = [];
+	  for (var key in obj) keys.push(key);
+	  return keys;
+	}
+
+
+/***/ },
+/* 269 */
+/***/ function(module, exports) {
+
+	var supportsArgumentsClass = (function(){
+	  return Object.prototype.toString.call(arguments)
+	})() == '[object Arguments]';
+
+	exports = module.exports = supportsArgumentsClass ? supported : unsupported;
+
+	exports.supported = supported;
+	function supported(object) {
+	  return Object.prototype.toString.call(object) == '[object Arguments]';
+	};
+
+	exports.unsupported = unsupported;
+	function unsupported(object){
+	  return object &&
+	    typeof object == 'object' &&
+	    typeof object.length == 'number' &&
+	    Object.prototype.hasOwnProperty.call(object, 'callee') &&
+	    !Object.prototype.propertyIsEnumerable.call(object, 'callee') ||
+	    false;
+	};
+
+
+/***/ },
+/* 270 */
+/***/ function(module, exports) {
+
+	'use strict';
+	/* eslint-disable no-unused-vars */
+	var hasOwnProperty = Object.prototype.hasOwnProperty;
+	var propIsEnumerable = Object.prototype.propertyIsEnumerable;
+
+	function toObject(val) {
+		if (val === null || val === undefined) {
+			throw new TypeError('Object.assign cannot be called with null or undefined');
+		}
+
+		return Object(val);
+	}
+
+	function shouldUseNative() {
+		try {
+			if (!Object.assign) {
+				return false;
+			}
+
+			// Detect buggy property enumeration order in older V8 versions.
+
+			// https://bugs.chromium.org/p/v8/issues/detail?id=4118
+			var test1 = new String('abc');  // eslint-disable-line
+			test1[5] = 'de';
+			if (Object.getOwnPropertyNames(test1)[0] === '5') {
+				return false;
+			}
+
+			// https://bugs.chromium.org/p/v8/issues/detail?id=3056
+			var test2 = {};
+			for (var i = 0; i < 10; i++) {
+				test2['_' + String.fromCharCode(i)] = i;
+			}
+			var order2 = Object.getOwnPropertyNames(test2).map(function (n) {
+				return test2[n];
+			});
+			if (order2.join('') !== '0123456789') {
+				return false;
+			}
+
+			// https://bugs.chromium.org/p/v8/issues/detail?id=3056
+			var test3 = {};
+			'abcdefghijklmnopqrst'.split('').forEach(function (letter) {
+				test3[letter] = letter;
+			});
+			if (Object.keys(Object.assign({}, test3)).join('') !==
+					'abcdefghijklmnopqrst') {
+				return false;
+			}
+
+			return true;
+		} catch (e) {
+			// We don't expect any of the above to throw, but better to be safe.
+			return false;
+		}
+	}
+
+	module.exports = shouldUseNative() ? Object.assign : function (target, source) {
+		var from;
+		var to = toObject(target);
+		var symbols;
+
+		for (var s = 1; s < arguments.length; s++) {
+			from = Object(arguments[s]);
+
+			for (var key in from) {
+				if (hasOwnProperty.call(from, key)) {
+					to[key] = from[key];
+				}
+			}
+
+			if (Object.getOwnPropertySymbols) {
+				symbols = Object.getOwnPropertySymbols(from);
+				for (var i = 0; i < symbols.length; i++) {
+					if (propIsEnumerable.call(from, symbols[i])) {
+						to[symbols[i]] = from[symbols[i]];
+					}
+				}
+			}
+		}
+
+		return to;
+	};
+
+
+/***/ },
+/* 271 */
+/***/ function(module, exports) {
+
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	var TAG_NAMES = {
+	    HTML: "htmlAttributes",
+	    TITLE: "title",
+	    BASE: "base",
+	    META: "meta",
+	    LINK: "link",
+	    SCRIPT: "script",
+	    STYLE: "style"
+	};
+
+	exports.TAG_NAMES = TAG_NAMES;
+	var TAG_PROPERTIES = {
+	    NAME: "name",
+	    CHARSET: "charset",
+	    HTTPEQUIV: "http-equiv",
+	    REL: "rel",
+	    HREF: "href",
+	    PROPERTY: "property",
+	    SRC: "src",
+	    INNER_HTML: "innerHTML",
+	    CSS_TEXT: "cssText"
+	};
+
+	exports.TAG_PROPERTIES = TAG_PROPERTIES;
+	var REACT_TAG_MAP = {
+	    "charset": "charSet",
+	    "http-equiv": "httpEquiv"
+	};
+	exports.REACT_TAG_MAP = REACT_TAG_MAP;
+
+/***/ },
+/* 272 */
+/***/ function(module, exports, __webpack_require__) {
+
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+
+	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+
+	var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; desc = parent = undefined; continue _function; } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+	var _react = __webpack_require__(1);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	var PlainComponent = (function (_React$Component) {
+	    _inherits(PlainComponent, _React$Component);
+
+	    function PlainComponent() {
+	        _classCallCheck(this, PlainComponent);
+
+	        _get(Object.getPrototypeOf(PlainComponent.prototype), "constructor", this).apply(this, arguments);
+	    }
+
+	    _createClass(PlainComponent, [{
+	        key: "render",
+	        value: function render() {
+	            return null;
+	        }
+	    }]);
+
+	    return PlainComponent;
+	})(_react2["default"].Component);
+
+	exports["default"] = PlainComponent;
+	module.exports = exports["default"];
+
+/***/ },
+/* 273 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -28624,11 +29592,11 @@
 	});
 	exports.fetch = exports.Api = undefined;
 
-	var _api = __webpack_require__(267);
+	var _api = __webpack_require__(274);
 
 	var _api2 = _interopRequireDefault(_api);
 
-	var _fetch = __webpack_require__(268);
+	var _fetch = __webpack_require__(275);
 
 	var _fetch2 = _interopRequireDefault(_fetch);
 
@@ -28638,7 +29606,7 @@
 	exports.fetch = _fetch2.default;
 
 /***/ },
-/* 267 */
+/* 274 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -28647,59 +29615,70 @@
 	    value: true
 	});
 
-	var _fetch = __webpack_require__(268);
+	var _fetch = __webpack_require__(275);
 
 	var _fetch2 = _interopRequireDefault(_fetch);
 
-	var _apiActions = __webpack_require__(271);
+	var _apiActions = __webpack_require__(278);
 
-	var _apiActions2 = _interopRequireDefault(_apiActions);
-
-	var _actionIdentifiers = __webpack_require__(265);
+	var _actionIdentifiers = __webpack_require__(279);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-	exports.default = {
-	    get: apiCall.bind(null, "GET")
+	var apiCall = function apiCall(method) {
+	    return function (action) {
+	        return function (params, body) {
+	            return function (dispatch) {
+	                var url = urlMapper(action, params);
+	                dispatch(action.started);
+	                dispatch(_apiActions.apiCallStarted);
+	                return (0, _fetch2.default)(url, method, body).then(function (res) {
+	                    return handleResponse(res, action, dispatch);
+	                }, function (err) {
+	                    return handleError(err, action, dispatch);
+	                });
+	            };
+	        };
+	    };
 	};
 
-
-	function apiCall(method, action, params) {
-	    return function (dispatch) {
-	        var url = urlMapper(action, params);
-	        dispatch(action.started());
-	        dispatch(_apiActions2.default.apiCallStarted());
-	        return (0, _fetch2.default)(url, "GET").then(function (res) {
-	            return handleResponse(res, action, dispatch);
-	        }, function (err) {
-	            return handleError(err, action, dispatch);
-	        });
-	    };
-	}
-
 	function urlMapper(action, params) {
+	    var baseUrl = getBaseUrl();
 	    switch (action.name) {
 	        case _actionIdentifiers.GET_PRODUCTS:
-	            return "/api/products";
+	            return baseUrl + "/products";
 	        case _actionIdentifiers.GET_PRODUCT:
-	            return "/api/products/" + params.id;
+	            return baseUrl + "/products/" + params.id;
+	        case _actionIdentifiers.LOGIN:
+	            return baseUrl + "/login";
 	        default:
-	            return null;
+	            throw new Error("action does not have a url defined in api.js");
 	    }
 	}
 
+	function getBaseUrl() {
+	    return typeof document === "undefined" ? "http://localhost:1234/api" : "/api";
+	}
+
 	function handleResponse(response, action, dispatch) {
-	    dispatch(_apiActions2.default.apiCallEnded());
+	    dispatch(_apiActions.apiCallEnded);
 	    dispatch(action.completed(response));
 	}
 
 	function handleError(response, action, dispatch) {
-	    dispatch(_apiActions2.default.apiCallEnded());
+	    dispatch(_apiActions.apiCallEnded);
 	    dispatch(action.failed(response));
 	}
 
+	exports.default = {
+	    get: apiCall("GET"),
+	    delete: apiCall("DELETE"),
+	    post: apiCall("POST"),
+	    put: apiCall("PUT")
+	};
+
 /***/ },
-/* 268 */
+/* 275 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -28708,7 +29687,7 @@
 	    value: true
 	});
 
-	var _isomorphicFetch = __webpack_require__(269);
+	var _isomorphicFetch = __webpack_require__(276);
 
 	var _isomorphicFetch2 = _interopRequireDefault(_isomorphicFetch);
 
@@ -28751,19 +29730,19 @@
 	}
 
 /***/ },
-/* 269 */
+/* 276 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// the whatwg-fetch polyfill installs the fetch() function
 	// on the global object (window or self)
 	//
 	// Return that as the export for use in Webpack, Browserify etc.
-	__webpack_require__(270);
+	__webpack_require__(277);
 	module.exports = self.fetch.bind(self);
 
 
 /***/ },
-/* 270 */
+/* 277 */
 /***/ function(module, exports) {
 
 	(function(self) {
@@ -29202,7 +30181,52 @@
 
 
 /***/ },
-/* 271 */
+/* 278 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	exports.apiCallEnded = exports.apiCallStarted = undefined;
+
+	var _actionIdentifiers = __webpack_require__(279);
+
+	var apiCallStarted = exports.apiCallStarted = { type: _actionIdentifiers.API_CALL_STARTED };
+	var apiCallEnded = exports.apiCallEnded = { type: _actionIdentifiers.API_CALL_ENDED };
+
+	exports.default = {
+	    apiCallStarted: apiCallStarted,
+	    apiCallEnded: apiCallEnded
+	};
+
+/***/ },
+/* 279 */
+/***/ function(module, exports) {
+
+	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	var ADD_TO_CART = exports.ADD_TO_CART = "ADD_TO_CART";
+	var API_CALL_STARTED = exports.API_CALL_STARTED = "API_CALL_STARTED";
+	var API_CALL_ENDED = exports.API_CALL_ENDED = "API_CALL_ENDED";
+	var GET_PRODUCT = exports.GET_PRODUCT = "GET_PRODUCT";
+	var GET_PRODUCT_COMPLETED = exports.GET_PRODUCT_COMPLETED = "GET_PRODUCT_COMPLETED";
+	var GET_PRODUCT_FAILED = exports.GET_PRODUCT_FAILED = "GET_PRODUCT_FAILED";
+	var GET_PRODUCTS = exports.GET_PRODUCTS = "GET_PRODUCTS";
+	var GET_PRODUCTS_COMPLETED = exports.GET_PRODUCTS_COMPLETED = "GET_PRODUCTS_COMPLETED";
+	var GET_PRODUCTS_FAILED = exports.GET_PRODUCTS_FAILED = "GET_PRODUCTS_FAILED";
+	var LOGIN = exports.LOGIN = "LOGIN";
+	var LOGIN_COMPLETED = exports.LOGIN_COMPLETED = "LOGIN_COMPLETED";
+	var LOGIN_FAILED = exports.LOGIN_FAILED = "LOGIN_FAILED";
+	var LOGOUT = exports.LOGOUT = "LOGOUT";
+	var SET_REDIRECT_AFTER_LOGIN = exports.SET_REDIRECT_AFTER_LOGIN = "SET_REDIRECT_AFTER_LOGIN";
+
+/***/ },
+/* 280 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -29211,27 +30235,1413 @@
 	    value: true
 	});
 
-	var _actionIdentifiers = __webpack_require__(265);
+	var _react = __webpack_require__(1);
 
-	function apiCallStarted() {
-	    return {
-	        type: _actionIdentifiers.API_CALL_STARTED
-	    };
-	}
+	var _react2 = _interopRequireDefault(_react);
 
-	function apiCallEnded() {
-	    return {
-	        type: _actionIdentifiers.API_CALL_ENDED
-	    };
-	}
+	var _reactHelmet = __webpack_require__(263);
 
-	exports.default = {
-	    apiCallStarted: apiCallStarted,
-	    apiCallEnded: apiCallEnded
+	var _reactHelmet2 = _interopRequireDefault(_reactHelmet);
+
+	var _dictionary = __webpack_require__(281);
+
+	var _dictionary2 = _interopRequireDefault(_dictionary);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	exports.default = function () {
+	    return _react2.default.createElement(
+	        "div",
+	        null,
+	        _react2.default.createElement(_reactHelmet2.default, { title: _dictionary2.default.home.title }),
+	        _react2.default.createElement(
+	            "h1",
+	            null,
+	            _dictionary2.default.home.title
+	        ),
+	        _react2.default.createElement(
+	            "p",
+	            null,
+	            _dictionary2.default.home.explanation
+	        )
+	    );
 	};
 
 /***/ },
-/* 272 */
+/* 281 */
+/***/ function(module, exports) {
+
+	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	exports.default = {
+	    home: {
+	        title: "Welcome to React!",
+	        explanation: "This application is created to show some cool features of working with React and Redux."
+	    },
+	    login: {
+	        title: "Login",
+	        explanation: "Login to have access to all functionalities"
+	    }
+	};
+
+/***/ },
+/* 282 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+
+	var _react = __webpack_require__(1);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	var _reactRouter = __webpack_require__(198);
+
+	var _reactRedux = __webpack_require__(172);
+
+	var _reactHelmet = __webpack_require__(263);
+
+	var _reactHelmet2 = _interopRequireDefault(_reactHelmet);
+
+	var _formsyReact = __webpack_require__(283);
+
+	var _formsyReact2 = _interopRequireDefault(_formsyReact);
+
+	var _dictionary = __webpack_require__(281);
+
+	var _dictionary2 = _interopRequireDefault(_dictionary);
+
+	var _helpers = __webpack_require__(273);
+
+	var _sessionActions = __webpack_require__(290);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	var Login = _react2.default.createClass({
+	    displayName: "Login",
+	    componentWillReceiveProps: function componentWillReceiveProps(nextProps) {
+	        if (!this.props.isAuthenticated && nextProps.isAuthenticated && this.props.redirectAfterLogin) {
+	            _reactRouter.browserHistory.push(this.props.redirectAfterLogin);
+	        }
+	    },
+	    render: function render() {
+	        return _react2.default.createElement(
+	            "div",
+	            null,
+	            _react2.default.createElement(_reactHelmet2.default, { title: _dictionary2.default.login.explanation }),
+	            _react2.default.createElement(
+	                "h1",
+	                null,
+	                _dictionary2.default.login.title
+	            ),
+	            _react2.default.createElement(
+	                _formsyReact2.default.Form,
+	                { onValidSubmit: this.props.onSubmitLogin },
+	                _react2.default.createElement(
+	                    "div",
+	                    null,
+	                    _react2.default.createElement(
+	                        "label",
+	                        { htmlFor: "username" },
+	                        "Username: "
+	                    ),
+	                    _react2.default.createElement("input", { type: "text", name: "username" })
+	                ),
+	                _react2.default.createElement(
+	                    "div",
+	                    null,
+	                    _react2.default.createElement(
+	                        "label",
+	                        { htmlFor: "password" },
+	                        "Password: "
+	                    ),
+	                    _react2.default.createElement("input", { type: "password", name: "password" })
+	                ),
+	                _react2.default.createElement(
+	                    "button",
+	                    { type: "submit" },
+	                    "Submit"
+	                )
+	            )
+	        );
+	    }
+	});
+
+	var mapStateToProps = function mapStateToProps(state) {
+	    return {
+	        isAuthenticated: state.session.isAuthenticated,
+	        redirectAfterLogin: state.session.redirectUrl
+	    };
+	};
+
+	var mapDispatchToProps = function mapDispatchToProps(dispatch) {
+	    return {
+	        onSubmitLogin: function onSubmitLogin(model) {
+	            var body = {};
+	            dispatch(_helpers.Api.post(_sessionActions.login)(null, body));
+	        }
+	    };
+	};
+
+	exports.default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)(Login);
+
+/***/ },
+/* 283 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/* WEBPACK VAR INJECTION */(function(global) {'use strict';
+
+	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
+	var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
+
+	function _objectWithoutProperties(obj, keys) { var target = {}; for (var i in obj) { if (keys.indexOf(i) >= 0) continue; if (!Object.prototype.hasOwnProperty.call(obj, i)) continue; target[i] = obj[i]; } return target; }
+
+	var React = global.React || __webpack_require__(1);
+	var Formsy = {};
+	var validationRules = __webpack_require__(284);
+	var formDataToObject = __webpack_require__(285);
+	var utils = __webpack_require__(286);
+	var Mixin = __webpack_require__(287);
+	var HOC = __webpack_require__(288);
+	var Decorator = __webpack_require__(289);
+	var options = {};
+	var emptyArray = [];
+
+	Formsy.Mixin = Mixin;
+	Formsy.HOC = HOC;
+	Formsy.Decorator = Decorator;
+
+	Formsy.defaults = function (passedOptions) {
+	  options = passedOptions;
+	};
+
+	Formsy.addValidationRule = function (name, func) {
+	  validationRules[name] = func;
+	};
+
+	Formsy.Form = React.createClass({
+	  displayName: 'Formsy',
+	  getInitialState: function getInitialState() {
+	    return {
+	      isValid: true,
+	      isSubmitting: false,
+	      canChange: false
+	    };
+	  },
+	  getDefaultProps: function getDefaultProps() {
+	    return {
+	      onSuccess: function onSuccess() {},
+	      onError: function onError() {},
+	      onSubmit: function onSubmit() {},
+	      onValidSubmit: function onValidSubmit() {},
+	      onInvalidSubmit: function onInvalidSubmit() {},
+	      onValid: function onValid() {},
+	      onInvalid: function onInvalid() {},
+	      onChange: function onChange() {},
+	      validationErrors: null,
+	      preventExternalInvalidation: false
+	    };
+	  },
+
+	  childContextTypes: {
+	    formsy: React.PropTypes.object
+	  },
+	  getChildContext: function getChildContext() {
+	    var _this = this;
+
+	    return {
+	      formsy: {
+	        attachToForm: this.attachToForm,
+	        detachFromForm: this.detachFromForm,
+	        validate: this.validate,
+	        isFormDisabled: this.isFormDisabled,
+	        isValidValue: function isValidValue(component, value) {
+	          return _this.runValidation(component, value).isValid;
+	        }
+	      }
+	    };
+	  },
+
+	  // Add a map to store the inputs of the form, a model to store
+	  // the values of the form and register child inputs
+	  componentWillMount: function componentWillMount() {
+	    this.inputs = [];
+	  },
+
+	  componentDidMount: function componentDidMount() {
+	    this.validateForm();
+	  },
+
+	  componentWillUpdate: function componentWillUpdate() {
+	    // Keep a reference to input names before form updates,
+	    // to check if inputs has changed after render
+	    this.prevInputNames = this.inputs.map(function (component) {
+	      return component.props.name;
+	    });
+	  },
+
+	  componentDidUpdate: function componentDidUpdate() {
+
+	    if (this.props.validationErrors && _typeof(this.props.validationErrors) === 'object' && Object.keys(this.props.validationErrors).length > 0) {
+	      this.setInputValidationErrors(this.props.validationErrors);
+	    }
+
+	    var newInputNames = this.inputs.map(function (component) {
+	      return component.props.name;
+	    });
+	    if (utils.arraysDiffer(this.prevInputNames, newInputNames)) {
+	      this.validateForm();
+	    }
+	  },
+
+	  // Allow resetting to specified data
+	  reset: function reset(data) {
+	    this.setFormPristine(true);
+	    this.resetModel(data);
+	  },
+
+	  // Update model, submit to url prop and send the model
+	  submit: function submit(event) {
+
+	    event && event.preventDefault();
+
+	    // Trigger form as not pristine.
+	    // If any inputs have not been touched yet this will make them dirty
+	    // so validation becomes visible (if based on isPristine)
+	    this.setFormPristine(false);
+	    var model = this.getModel();
+	    this.props.onSubmit(model, this.resetModel, this.updateInputsWithError);
+	    this.state.isValid ? this.props.onValidSubmit(model, this.resetModel, this.updateInputsWithError) : this.props.onInvalidSubmit(model, this.resetModel, this.updateInputsWithError);
+	  },
+
+	  mapModel: function mapModel(model) {
+
+	    if (this.props.mapping) {
+	      return this.props.mapping(model);
+	    } else {
+	      return formDataToObject.toObj(Object.keys(model).reduce(function (mappedModel, key) {
+
+	        var keyArray = key.split('.');
+	        var base = mappedModel;
+	        while (keyArray.length) {
+	          var currentKey = keyArray.shift();
+	          base = base[currentKey] = keyArray.length ? base[currentKey] || {} : model[key];
+	        }
+
+	        return mappedModel;
+	      }, {}));
+	    }
+	  },
+
+	  getModel: function getModel() {
+	    var currentValues = this.getCurrentValues();
+	    return this.mapModel(currentValues);
+	  },
+
+	  // Reset each key in the model to the original / initial / specified value
+	  resetModel: function resetModel(data) {
+	    this.inputs.forEach(function (component) {
+	      var name = component.props.name;
+	      if (data && data.hasOwnProperty(name)) {
+	        component.setValue(data[name]);
+	      } else {
+	        component.resetValue();
+	      }
+	    });
+	    this.validateForm();
+	  },
+
+	  setInputValidationErrors: function setInputValidationErrors(errors) {
+	    this.inputs.forEach(function (component) {
+	      var name = component.props.name;
+	      var args = [{
+	        _isValid: !(name in errors),
+	        _validationError: typeof errors[name] === 'string' ? [errors[name]] : errors[name]
+	      }];
+	      component.setState.apply(component, args);
+	    });
+	  },
+
+	  // Checks if the values have changed from their initial value
+	  isChanged: function isChanged() {
+	    return !utils.isSame(this.getPristineValues(), this.getCurrentValues());
+	  },
+
+	  getPristineValues: function getPristineValues() {
+	    return this.inputs.reduce(function (data, component) {
+	      var name = component.props.name;
+	      data[name] = component.props.value;
+	      return data;
+	    }, {});
+	  },
+
+	  // Go through errors from server and grab the components
+	  // stored in the inputs map. Change their state to invalid
+	  // and set the serverError message
+	  updateInputsWithError: function updateInputsWithError(errors) {
+	    var _this2 = this;
+
+	    Object.keys(errors).forEach(function (name, index) {
+	      var component = utils.find(_this2.inputs, function (component) {
+	        return component.props.name === name;
+	      });
+	      if (!component) {
+	        throw new Error('You are trying to update an input that does not exist. ' + 'Verify errors object with input names. ' + JSON.stringify(errors));
+	      }
+	      var args = [{
+	        _isValid: _this2.props.preventExternalInvalidation || false,
+	        _externalError: typeof errors[name] === 'string' ? [errors[name]] : errors[name]
+	      }];
+	      component.setState.apply(component, args);
+	    });
+	  },
+
+	  isFormDisabled: function isFormDisabled() {
+	    return this.props.disabled;
+	  },
+
+	  getCurrentValues: function getCurrentValues() {
+	    return this.inputs.reduce(function (data, component) {
+	      var name = component.props.name;
+	      data[name] = component.state._value;
+	      return data;
+	    }, {});
+	  },
+
+	  setFormPristine: function setFormPristine(isPristine) {
+	    this.setState({
+	      _formSubmitted: !isPristine
+	    });
+
+	    // Iterate through each component and set it as pristine
+	    // or "dirty".
+	    this.inputs.forEach(function (component, index) {
+	      component.setState({
+	        _formSubmitted: !isPristine,
+	        _isPristine: isPristine
+	      });
+	    });
+	  },
+
+	  // Use the binded values and the actual input value to
+	  // validate the input and set its state. Then check the
+	  // state of the form itself
+	  validate: function validate(component) {
+
+	    // Trigger onChange
+	    if (this.state.canChange) {
+	      this.props.onChange(this.getCurrentValues(), this.isChanged());
+	    }
+
+	    var validation = this.runValidation(component);
+	    // Run through the validations, split them up and call
+	    // the validator IF there is a value or it is required
+	    component.setState({
+	      _isValid: validation.isValid,
+	      _isRequired: validation.isRequired,
+	      _validationError: validation.error,
+	      _externalError: null
+	    }, this.validateForm);
+	  },
+
+	  // Checks validation on current value or a passed value
+	  runValidation: function runValidation(component, value) {
+
+	    var currentValues = this.getCurrentValues();
+	    var validationErrors = component.props.validationErrors;
+	    var validationError = component.props.validationError;
+	    value = arguments.length === 2 ? value : component.state._value;
+
+	    var validationResults = this.runRules(value, currentValues, component._validations);
+	    var requiredResults = this.runRules(value, currentValues, component._requiredValidations);
+
+	    // the component defines an explicit validate function
+	    if (typeof component.validate === "function") {
+	      validationResults.failed = component.validate() ? [] : ['failed'];
+	    }
+
+	    var isRequired = Object.keys(component._requiredValidations).length ? !!requiredResults.success.length : false;
+	    var isValid = !validationResults.failed.length && !(this.props.validationErrors && this.props.validationErrors[component.props.name]);
+
+	    return {
+	      isRequired: isRequired,
+	      isValid: isRequired ? false : isValid,
+	      error: function () {
+
+	        if (isValid && !isRequired) {
+	          return emptyArray;
+	        }
+
+	        if (validationResults.errors.length) {
+	          return validationResults.errors;
+	        }
+
+	        if (this.props.validationErrors && this.props.validationErrors[component.props.name]) {
+	          return typeof this.props.validationErrors[component.props.name] === 'string' ? [this.props.validationErrors[component.props.name]] : this.props.validationErrors[component.props.name];
+	        }
+
+	        if (isRequired) {
+	          var error = validationErrors[requiredResults.success[0]];
+	          return error ? [error] : null;
+	        }
+
+	        if (validationResults.failed.length) {
+	          return validationResults.failed.map(function (failed) {
+	            return validationErrors[failed] ? validationErrors[failed] : validationError;
+	          }).filter(function (x, pos, arr) {
+	            // Remove duplicates
+	            return arr.indexOf(x) === pos;
+	          });
+	        }
+	      }.call(this)
+	    };
+	  },
+
+	  runRules: function runRules(value, currentValues, validations) {
+
+	    var results = {
+	      errors: [],
+	      failed: [],
+	      success: []
+	    };
+	    if (Object.keys(validations).length) {
+	      Object.keys(validations).forEach(function (validationMethod) {
+
+	        if (validationRules[validationMethod] && typeof validations[validationMethod] === 'function') {
+	          throw new Error('Formsy does not allow you to override default validations: ' + validationMethod);
+	        }
+
+	        if (!validationRules[validationMethod] && typeof validations[validationMethod] !== 'function') {
+	          throw new Error('Formsy does not have the validation rule: ' + validationMethod);
+	        }
+
+	        if (typeof validations[validationMethod] === 'function') {
+	          var validation = validations[validationMethod](currentValues, value);
+	          if (typeof validation === 'string') {
+	            results.errors.push(validation);
+	            results.failed.push(validationMethod);
+	          } else if (!validation) {
+	            results.failed.push(validationMethod);
+	          }
+	          return;
+	        } else if (typeof validations[validationMethod] !== 'function') {
+	          var validation = validationRules[validationMethod](currentValues, value, validations[validationMethod]);
+	          if (typeof validation === 'string') {
+	            results.errors.push(validation);
+	            results.failed.push(validationMethod);
+	          } else if (!validation) {
+	            results.failed.push(validationMethod);
+	          } else {
+	            results.success.push(validationMethod);
+	          }
+	          return;
+	        }
+
+	        return results.success.push(validationMethod);
+	      });
+	    }
+
+	    return results;
+	  },
+
+	  // Validate the form by going through all child input components
+	  // and check their state
+	  validateForm: function validateForm() {
+	    var _this3 = this;
+
+	    // We need a callback as we are validating all inputs again. This will
+	    // run when the last component has set its state
+	    var onValidationComplete = function () {
+	      var allIsValid = this.inputs.every(function (component) {
+	        return component.state._isValid;
+	      });
+
+	      this.setState({
+	        isValid: allIsValid
+	      });
+
+	      if (allIsValid) {
+	        this.props.onValid();
+	      } else {
+	        this.props.onInvalid();
+	      }
+
+	      // Tell the form that it can start to trigger change events
+	      this.setState({
+	        canChange: true
+	      });
+	    }.bind(this);
+
+	    // Run validation again in case affected by other inputs. The
+	    // last component validated will run the onValidationComplete callback
+	    this.inputs.forEach(function (component, index) {
+	      var validation = _this3.runValidation(component);
+	      if (validation.isValid && component.state._externalError) {
+	        validation.isValid = false;
+	      }
+	      component.setState({
+	        _isValid: validation.isValid,
+	        _isRequired: validation.isRequired,
+	        _validationError: validation.error,
+	        _externalError: !validation.isValid && component.state._externalError ? component.state._externalError : null
+	      }, index === _this3.inputs.length - 1 ? onValidationComplete : null);
+	    });
+
+	    // If there are no inputs, set state where form is ready to trigger
+	    // change event. New inputs might be added later
+	    if (!this.inputs.length && this.isMounted()) {
+	      this.setState({
+	        canChange: true
+	      });
+	    }
+	  },
+
+	  // Method put on each input component to register
+	  // itself to the form
+	  attachToForm: function attachToForm(component) {
+
+	    if (this.inputs.indexOf(component) === -1) {
+	      this.inputs.push(component);
+	    }
+
+	    this.validate(component);
+	  },
+
+	  // Method put on each input component to unregister
+	  // itself from the form
+	  detachFromForm: function detachFromForm(component) {
+	    var componentPos = this.inputs.indexOf(component);
+
+	    if (componentPos !== -1) {
+	      this.inputs = this.inputs.slice(0, componentPos).concat(this.inputs.slice(componentPos + 1));
+	    }
+
+	    this.validateForm();
+	  },
+	  render: function render() {
+	    var _props = this.props;
+	    var mapping = _props.mapping;
+	    var validationErrors = _props.validationErrors;
+	    var onSubmit = _props.onSubmit;
+	    var onValid = _props.onValid;
+	    var onValidSubmit = _props.onValidSubmit;
+	    var onInvalid = _props.onInvalid;
+	    var onInvalidSubmit = _props.onInvalidSubmit;
+	    var onChange = _props.onChange;
+	    var reset = _props.reset;
+	    var preventExternalInvalidation = _props.preventExternalInvalidation;
+	    var onSuccess = _props.onSuccess;
+	    var onError = _props.onError;
+
+	    var nonFormsyProps = _objectWithoutProperties(_props, ['mapping', 'validationErrors', 'onSubmit', 'onValid', 'onValidSubmit', 'onInvalid', 'onInvalidSubmit', 'onChange', 'reset', 'preventExternalInvalidation', 'onSuccess', 'onError']);
+
+	    return React.createElement(
+	      'form',
+	      _extends({}, nonFormsyProps, { onSubmit: this.submit }),
+	      this.props.children
+	    );
+	  }
+	});
+
+	if (!global.exports && !global.module && (!global.define || !global.define.amd)) {
+	  global.Formsy = Formsy;
+	}
+
+	module.exports = Formsy;
+	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
+
+/***/ },
+/* 284 */
+/***/ function(module, exports) {
+
+	'use strict';
+
+	var _isExisty = function _isExisty(value) {
+	  return value !== null && value !== undefined;
+	};
+
+	var isEmpty = function isEmpty(value) {
+	  return value === '';
+	};
+
+	var validations = {
+	  isDefaultRequiredValue: function isDefaultRequiredValue(values, value) {
+	    return value === undefined || value === '';
+	  },
+	  isExisty: function isExisty(values, value) {
+	    return _isExisty(value);
+	  },
+	  matchRegexp: function matchRegexp(values, value, regexp) {
+	    return !_isExisty(value) || isEmpty(value) || regexp.test(value);
+	  },
+	  isUndefined: function isUndefined(values, value) {
+	    return value === undefined;
+	  },
+	  isEmptyString: function isEmptyString(values, value) {
+	    return isEmpty(value);
+	  },
+	  isEmail: function isEmail(values, value) {
+	    return validations.matchRegexp(values, value, /^((([a-z]|\d|[!#\$%&'\*\+\-\/=\?\^_`{\|}~]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])+(\.([a-z]|\d|[!#\$%&'\*\+\-\/=\?\^_`{\|}~]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])+)*)|((\x22)((((\x20|\x09)*(\x0d\x0a))?(\x20|\x09)+)?(([\x01-\x08\x0b\x0c\x0e-\x1f\x7f]|\x21|[\x23-\x5b]|[\x5d-\x7e]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(\\([\x01-\x09\x0b\x0c\x0d-\x7f]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]))))*(((\x20|\x09)*(\x0d\x0a))?(\x20|\x09)+)?(\x22)))@((([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])*([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])))\.)+(([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])*([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])))$/i);
+	  },
+	  isUrl: function isUrl(values, value) {
+	    return validations.matchRegexp(values, value, /^(https?|s?ftp):\/\/(((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:)*@)?(((\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5]))|((([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])*([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])))\.)+(([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])*([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])))\.?)(:\d*)?)(\/((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)+(\/(([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)*)*)?)?(\?((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)|[\uE000-\uF8FF]|\/|\?)*)?(#((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)|\/|\?)*)?$/i);
+	  },
+	  isTrue: function isTrue(values, value) {
+	    return value === true;
+	  },
+	  isFalse: function isFalse(values, value) {
+	    return value === false;
+	  },
+	  isNumeric: function isNumeric(values, value) {
+	    if (typeof value === 'number') {
+	      return true;
+	    }
+	    return validations.matchRegexp(values, value, /^[-+]?(?:\d*[.])?\d+$/);
+	  },
+	  isAlpha: function isAlpha(values, value) {
+	    return validations.matchRegexp(values, value, /^[A-Z]+$/i);
+	  },
+	  isAlphanumeric: function isAlphanumeric(values, value) {
+	    return validations.matchRegexp(values, value, /^[0-9A-Z]+$/i);
+	  },
+	  isInt: function isInt(values, value) {
+	    return validations.matchRegexp(values, value, /^(?:[-+]?(?:0|[1-9]\d*))$/);
+	  },
+	  isFloat: function isFloat(values, value) {
+	    return validations.matchRegexp(values, value, /^(?:[-+]?(?:\d+))?(?:\.\d*)?(?:[eE][\+\-]?(?:\d+))?$/);
+	  },
+	  isWords: function isWords(values, value) {
+	    return validations.matchRegexp(values, value, /^[A-Z\s]+$/i);
+	  },
+	  isSpecialWords: function isSpecialWords(values, value) {
+	    return validations.matchRegexp(values, value, /^[A-Z\s\u00C0-\u017F]+$/i);
+	  },
+	  isLength: function isLength(values, value, length) {
+	    return !_isExisty(value) || isEmpty(value) || value.length === length;
+	  },
+	  equals: function equals(values, value, eql) {
+	    return !_isExisty(value) || isEmpty(value) || value == eql;
+	  },
+	  equalsField: function equalsField(values, value, field) {
+	    return value == values[field];
+	  },
+	  maxLength: function maxLength(values, value, length) {
+	    return !_isExisty(value) || value.length <= length;
+	  },
+	  minLength: function minLength(values, value, length) {
+	    return !_isExisty(value) || isEmpty(value) || value.length >= length;
+	  }
+	};
+
+	module.exports = validations;
+
+/***/ },
+/* 285 */
+/***/ function(module, exports) {
+
+	function toObj(source) {
+	  return Object.keys(source).reduce(function (output, key) {
+	    var parentKey = key.match(/[^\[]*/i);
+	    var paths = key.match(/\[.*?\]/g) || [];
+	    paths = [parentKey[0]].concat(paths).map(function (key) {
+	      return key.replace(/\[|\]/g, '');
+	    });
+	    var currentPath = output;
+	    while (paths.length) {
+	      var pathKey = paths.shift();
+
+	      if (pathKey in currentPath) {
+	        currentPath = currentPath[pathKey];
+	      } else {
+	        currentPath[pathKey] = paths.length ? isNaN(paths[0]) ? {} : [] : source[key];
+	        currentPath = currentPath[pathKey];
+	      }
+	    }
+
+	    return output;
+	  }, {});
+	}
+
+	function fromObj(obj) {
+	  function recur(newObj, propName, currVal) {
+	    if (Array.isArray(currVal) || Object.prototype.toString.call(currVal) === '[object Object]') {
+	      Object.keys(currVal).forEach(function(v) {
+	        recur(newObj, propName + "[" + v + "]", currVal[v]);
+	      });
+	      return newObj;
+	    }
+
+	    newObj[propName] = currVal;
+	    return newObj;
+	  }
+
+	  var keys = Object.keys(obj);
+	  return keys.reduce(function(newObj, propName) {
+	    return recur(newObj, propName, obj[propName]);
+	  }, {});
+	}
+
+	module.exports = {
+	  fromObj: fromObj,
+	  toObj: toObj
+	}
+
+/***/ },
+/* 286 */
+/***/ function(module, exports) {
+
+	'use strict';
+
+	var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
+
+	module.exports = {
+	  arraysDiffer: function arraysDiffer(a, b) {
+	    var isDifferent = false;
+	    if (a.length !== b.length) {
+	      isDifferent = true;
+	    } else {
+	      a.forEach(function (item, index) {
+	        if (!this.isSame(item, b[index])) {
+	          isDifferent = true;
+	        }
+	      }, this);
+	    }
+	    return isDifferent;
+	  },
+
+	  objectsDiffer: function objectsDiffer(a, b) {
+	    var isDifferent = false;
+	    if (Object.keys(a).length !== Object.keys(b).length) {
+	      isDifferent = true;
+	    } else {
+	      Object.keys(a).forEach(function (key) {
+	        if (!this.isSame(a[key], b[key])) {
+	          isDifferent = true;
+	        }
+	      }, this);
+	    }
+	    return isDifferent;
+	  },
+
+	  isSame: function isSame(a, b) {
+	    if ((typeof a === 'undefined' ? 'undefined' : _typeof(a)) !== (typeof b === 'undefined' ? 'undefined' : _typeof(b))) {
+	      return false;
+	    } else if (Array.isArray(a)) {
+	      return !this.arraysDiffer(a, b);
+	    } else if (typeof a === 'function') {
+	      return a.toString() === b.toString();
+	    } else if ((typeof a === 'undefined' ? 'undefined' : _typeof(a)) === 'object' && a !== null && b !== null) {
+	      return !this.objectsDiffer(a, b);
+	    }
+
+	    return a === b;
+	  },
+
+	  find: function find(collection, fn) {
+	    for (var i = 0, l = collection.length; i < l; i++) {
+	      var item = collection[i];
+	      if (fn(item)) {
+	        return item;
+	      }
+	    }
+	    return null;
+	  }
+	};
+
+/***/ },
+/* 287 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/* WEBPACK VAR INJECTION */(function(global) {'use strict';
+
+	var utils = __webpack_require__(286);
+	var React = global.React || __webpack_require__(1);
+
+	var convertValidationsToObject = function convertValidationsToObject(validations) {
+
+	  if (typeof validations === 'string') {
+
+	    return validations.split(/\,(?![^{\[]*[}\]])/g).reduce(function (validations, validation) {
+	      var args = validation.split(':');
+	      var validateMethod = args.shift();
+
+	      args = args.map(function (arg) {
+	        try {
+	          return JSON.parse(arg);
+	        } catch (e) {
+	          return arg; // It is a string if it can not parse it
+	        }
+	      });
+
+	      if (args.length > 1) {
+	        throw new Error('Formsy does not support multiple args on string validations. Use object format of validations instead.');
+	      }
+
+	      validations[validateMethod] = args.length ? args[0] : true;
+	      return validations;
+	    }, {});
+	  }
+
+	  return validations || {};
+	};
+
+	module.exports = {
+	  getInitialState: function getInitialState() {
+	    return {
+	      _value: this.props.value,
+	      _isRequired: false,
+	      _isValid: true,
+	      _isPristine: true,
+	      _pristineValue: this.props.value,
+	      _validationError: [],
+	      _externalError: null,
+	      _formSubmitted: false
+	    };
+	  },
+	  contextTypes: {
+	    formsy: React.PropTypes.object // What about required?
+	  },
+	  getDefaultProps: function getDefaultProps() {
+	    return {
+	      validationError: '',
+	      validationErrors: {}
+	    };
+	  },
+
+	  componentWillMount: function componentWillMount() {
+	    var configure = function () {
+	      this.setValidations(this.props.validations, this.props.required);
+
+	      // Pass a function instead?
+	      this.context.formsy.attachToForm(this);
+	      //this.props._attachToForm(this);
+	    }.bind(this);
+
+	    if (!this.props.name) {
+	      throw new Error('Form Input requires a name property when used');
+	    }
+
+	    /*
+	    if (!this.props._attachToForm) {
+	      return setTimeout(function () {
+	        if (!this.isMounted()) return;
+	        if (!this.props._attachToForm) {
+	          throw new Error('Form Mixin requires component to be nested in a Form');
+	        }
+	        configure();
+	      }.bind(this), 0);
+	    }
+	    */
+	    configure();
+	  },
+
+	  // We have to make the validate method is kept when new props are added
+	  componentWillReceiveProps: function componentWillReceiveProps(nextProps) {
+	    this.setValidations(nextProps.validations, nextProps.required);
+	  },
+
+	  componentDidUpdate: function componentDidUpdate(prevProps) {
+
+	    // If the value passed has changed, set it. If value is not passed it will
+	    // internally update, and this will never run
+	    if (!utils.isSame(this.props.value, prevProps.value)) {
+	      this.setValue(this.props.value);
+	    }
+
+	    // If validations or required is changed, run a new validation
+	    if (!utils.isSame(this.props.validations, prevProps.validations) || !utils.isSame(this.props.required, prevProps.required)) {
+	      this.context.formsy.validate(this);
+	    }
+	  },
+
+	  // Detach it when component unmounts
+	  componentWillUnmount: function componentWillUnmount() {
+	    this.context.formsy.detachFromForm(this);
+	    //this.props._detachFromForm(this);
+	  },
+
+	  setValidations: function setValidations(validations, required) {
+
+	    // Add validations to the store itself as the props object can not be modified
+	    this._validations = convertValidationsToObject(validations) || {};
+	    this._requiredValidations = required === true ? { isDefaultRequiredValue: true } : convertValidationsToObject(required);
+	  },
+
+	  // We validate after the value has been set
+	  setValue: function setValue(value) {
+	    this.setState({
+	      _value: value,
+	      _isPristine: false
+	    }, function () {
+	      this.context.formsy.validate(this);
+	      //this.props._validate(this);
+	    }.bind(this));
+	  },
+	  resetValue: function resetValue() {
+	    this.setState({
+	      _value: this.state._pristineValue,
+	      _isPristine: true
+	    }, function () {
+	      this.context.formsy.validate(this);
+	      //this.props._validate(this);
+	    });
+	  },
+	  getValue: function getValue() {
+	    return this.state._value;
+	  },
+	  hasValue: function hasValue() {
+	    return this.state._value !== '';
+	  },
+	  getErrorMessage: function getErrorMessage() {
+	    var messages = this.getErrorMessages();
+	    return messages.length ? messages[0] : null;
+	  },
+	  getErrorMessages: function getErrorMessages() {
+	    return !this.isValid() || this.showRequired() ? this.state._externalError || this.state._validationError || [] : [];
+	  },
+	  isFormDisabled: function isFormDisabled() {
+	    return this.context.formsy.isFormDisabled();
+	    //return this.props._isFormDisabled();
+	  },
+	  isValid: function isValid() {
+	    return this.state._isValid;
+	  },
+	  isPristine: function isPristine() {
+	    return this.state._isPristine;
+	  },
+	  isFormSubmitted: function isFormSubmitted() {
+	    return this.state._formSubmitted;
+	  },
+	  isRequired: function isRequired() {
+	    return !!this.props.required;
+	  },
+	  showRequired: function showRequired() {
+	    return this.state._isRequired;
+	  },
+	  showError: function showError() {
+	    return !this.showRequired() && !this.isValid();
+	  },
+	  isValidValue: function isValidValue(value) {
+	    return this.context.formsy.isValidValue.call(null, this, value);
+	    //return this.props._isValidValue.call(null, this, value);
+	  }
+	};
+	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
+
+/***/ },
+/* 288 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/* WEBPACK VAR INJECTION */(function(global) {'use strict';
+
+	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
+	var React = global.React || __webpack_require__(1);
+	var Mixin = __webpack_require__(287);
+	module.exports = function (Component) {
+	  return React.createClass({
+	    displayName: 'Formsy(' + getDisplayName(Component) + ')',
+	    mixins: [Mixin],
+	    render: function render() {
+	      return React.createElement(Component, _extends({
+	        setValidations: this.setValidations,
+	        setValue: this.setValue,
+	        resetValue: this.resetValue,
+	        getValue: this.getValue,
+	        hasValue: this.hasValue,
+	        getErrorMessage: this.getErrorMessage,
+	        getErrorMessages: this.getErrorMessages,
+	        isFormDisabled: this.isFormDisabled,
+	        isValid: this.isValid,
+	        isPristine: this.isPristine,
+	        isFormSubmitted: this.isFormSubmitted,
+	        isRequired: this.isRequired,
+	        showRequired: this.showRequired,
+	        showError: this.showError,
+	        isValidValue: this.isValidValue
+	      }, this.props));
+	    }
+	  });
+	};
+
+	function getDisplayName(Component) {
+	  return Component.displayName || Component.name || (typeof Component === 'string' ? Component : 'Component');
+	}
+	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
+
+/***/ },
+/* 289 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/* WEBPACK VAR INJECTION */(function(global) {'use strict';
+
+	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
+	var React = global.React || __webpack_require__(1);
+	var Mixin = __webpack_require__(287);
+	module.exports = function () {
+	  return function (Component) {
+	    return React.createClass({
+	      mixins: [Mixin],
+	      render: function render() {
+	        return React.createElement(Component, _extends({
+	          setValidations: this.setValidations,
+	          setValue: this.setValue,
+	          resetValue: this.resetValue,
+	          getValue: this.getValue,
+	          hasValue: this.hasValue,
+	          getErrorMessage: this.getErrorMessage,
+	          getErrorMessages: this.getErrorMessages,
+	          isFormDisabled: this.isFormDisabled,
+	          isValid: this.isValid,
+	          isPristine: this.isPristine,
+	          isFormSubmitted: this.isFormSubmitted,
+	          isRequired: this.isRequired,
+	          showRequired: this.showRequired,
+	          showError: this.showError,
+	          isValidValue: this.isValidValue
+	        }, this.props));
+	      }
+	    });
+	  };
+	};
+	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
+
+/***/ },
+/* 290 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	exports.setRedirectAfterLogin = exports.logout = exports.login = undefined;
+
+	var _actionIdentifiers = __webpack_require__(279);
+
+	var Actions = _interopRequireWildcard(_actionIdentifiers);
+
+	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+
+	var login = exports.login = {
+	    name: Actions.LOGIN,
+	    started: {
+	        type: Actions.LOGIN
+	    },
+	    completed: function completed(response) {
+	        return {
+	            type: Actions.LOGIN_COMPLETED,
+	            token: response.token
+	        };
+	    },
+	    failed: function failed(error) {
+	        return {
+	            type: Actions.LOGIN_FAILED,
+	            message: error.message
+	        };
+	    }
+	};
+
+	var logout = exports.logout = {
+	    type: Actions.LOGOUT
+	};
+
+	var setRedirectAfterLogin = exports.setRedirectAfterLogin = function setRedirectAfterLogin(redirectUrl) {
+	    return {
+	        type: Actions.SET_REDIRECT_AFTER_LOGIN,
+	        redirectUrl: redirectUrl
+	    };
+	};
+
+/***/ },
+/* 291 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+
+	var _react = __webpack_require__(1);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	var _reactRedux = __webpack_require__(172);
+
+	var _productActions = __webpack_require__(292);
+
+	var _helpers = __webpack_require__(273);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	var loadProduct = _helpers.Api.get(_productActions.fetchProduct);
+
+	var ProductDetails = _react2.default.createClass({
+	    displayName: "ProductDetails",
+
+	    propTypes: {
+	        params: _react2.default.PropTypes.object,
+	        product: _react2.default.PropTypes.object.isRequired,
+	        dispatch: _react2.default.PropTypes.func
+	    },
+
+	    statics: {
+	        prerequisites: function prerequisites(_ref) {
+	            var params = _ref.params;
+	            return loadProduct({ id: params.id });
+	        }
+	    },
+
+	    componentDidMount: function componentDidMount() {
+	        if (this.props.product.id !== parseInt(this.props.params.id, 10)) {
+	            this.props.dispatch(loadProduct({ id: this.props.params.id }));
+	        }
+	    },
+	    render: function render() {
+	        var product = this.props.product;
+	        return _react2.default.createElement(
+	            "div",
+	            null,
+	            _react2.default.createElement(
+	                "h1",
+	                null,
+	                "Product Details!"
+	            ),
+	            _react2.default.createElement(
+	                "h2",
+	                null,
+	                product.name
+	            ),
+	            _react2.default.createElement(
+	                "p",
+	                null,
+	                "Price: $",
+	                product.price
+	            ),
+	            _react2.default.createElement(
+	                "p",
+	                null,
+	                "Description: ",
+	                product.description
+	            )
+	        );
+	    }
+	});
+
+	var mapStateToProps = function mapStateToProps(state) {
+	    return {
+	        product: state.selectedProduct
+	    };
+	};
+
+	exports.default = (0, _reactRedux.connect)(mapStateToProps)(ProductDetails);
+
+/***/ },
+/* 292 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	exports.fetchProducts = exports.fetchProduct = exports.addToCart = undefined;
+
+	var _actionIdentifiers = __webpack_require__(279);
+
+	var Actions = _interopRequireWildcard(_actionIdentifiers);
+
+	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+
+	var addToCart = exports.addToCart = function addToCart(product) {
+	    return {
+	        type: Actions.ADD_TO_CART,
+	        product: product
+	    };
+	};
+
+	var fetchProduct = exports.fetchProduct = {
+	    name: Actions.GET_PRODUCT,
+	    started: {
+	        type: Actions.GET_PRODUCT
+	    },
+	    completed: function completed(response) {
+	        return {
+	            type: Actions.GET_PRODUCT_COMPLETED,
+	            product: response.product
+	        };
+	    },
+	    failed: function failed(error) {
+	        return {
+	            type: Actions.GET_PRODUCT_FAILED,
+	            message: error.message
+	        };
+	    }
+	};
+
+	var fetchProducts = exports.fetchProducts = {
+	    name: Actions.GET_PRODUCTS,
+	    started: {
+	        type: Actions.GET_PRODUCTS
+	    },
+	    completed: function completed(response) {
+	        return {
+	            type: Actions.GET_PRODUCTS_COMPLETED,
+	            products: response.products
+	        };
+	    },
+	    failed: function failed(error) {
+	        return {
+	            type: Actions.GET_PRODUCTS_FAILED,
+	            message: error.message
+	        };
+	    }
+	};
+
+/***/ },
+/* 293 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+
+	var _react = __webpack_require__(1);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	var _reactRedux = __webpack_require__(172);
+
+	var _reactHelmet = __webpack_require__(263);
+
+	var _reactHelmet2 = _interopRequireDefault(_reactHelmet);
+
+	var _productActions = __webpack_require__(292);
+
+	var _helpers = __webpack_require__(273);
+
+	var _components = __webpack_require__(294);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	var loadProducts = _helpers.Api.get(_productActions.fetchProducts);
+
+	var ProductList = _react2.default.createClass({
+	    displayName: "ProductList",
+
+	    propTypes: {
+	        products: _react2.default.PropTypes.array,
+	        dispatch: _react2.default.PropTypes.func
+	    },
+
+	    statics: {
+	        prerequisites: loadProducts
+	    },
+
+	    componentDidMount: function componentDidMount() {
+	        this.props.dispatch(loadProducts);
+	    },
+	    render: function render() {
+	        var products = this.props.products;
+	        return _react2.default.createElement(
+	            "div",
+	            null,
+	            _react2.default.createElement(_reactHelmet2.default, { title: "Fresh food!" }),
+	            _react2.default.createElement(
+	                "h1",
+	                null,
+	                "Product List!"
+	            ),
+	            products.map(function (product, index) {
+	                return _react2.default.createElement(_components.ProductEntry, { product: product, key: index });
+	            })
+	        );
+	    }
+	});
+
+	var mapStateToProps = function mapStateToProps(state) {
+	    return {
+	        products: state.products
+	    };
+	};
+
+	exports.default = (0, _reactRedux.connect)(mapStateToProps)(ProductList);
+
+/***/ },
+/* 294 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	exports.ProductEntry = undefined;
+
+	var _productEntry = __webpack_require__(295);
+
+	var _productEntry2 = _interopRequireDefault(_productEntry);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	exports.ProductEntry = _productEntry2.default;
+
+/***/ },
+/* 295 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+
+	var _react = __webpack_require__(1);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	var _reactRouter = __webpack_require__(198);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	var ProductEntry = function ProductEntry(_ref) {
+	    var product = _ref.product;
+	    return _react2.default.createElement(
+	        "div",
+	        null,
+	        _react2.default.createElement(
+	            _reactRouter.Link,
+	            { to: "/products/" + product.id },
+	            product.name
+	        ),
+	        " - ",
+	        _react2.default.createElement(
+	            "span",
+	            null,
+	            product.price
+	        )
+	    );
+	};
+
+	ProductEntry.propTypes = {
+	    product: _react2.default.PropTypes.object
+	};
+
+	exports.default = ProductEntry;
+
+/***/ },
+/* 296 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -29275,6 +31685,11 @@
 	                _reactRouter.Link,
 	                { to: "/products" },
 	                "Products"
+	            ),
+	            _react2.default.createElement(
+	                _reactRouter.Link,
+	                { to: "/my-cart" },
+	                "My Cart"
 	            )
 	        ),
 	        _react2.default.createElement(
@@ -29286,6 +31701,11 @@
 	    );
 	};
 
+	Layout.propTypes = {
+	    showSpinner: _react2.default.PropTypes.bool,
+	    children: _react2.default.PropTypes.object
+	};
+
 	function mapStateToProps(state) {
 	    return {
 	        showSpinner: state.busy > 0
@@ -29295,7 +31715,103 @@
 	exports.default = (0, _reactRedux.connect)(mapStateToProps)(Layout);
 
 /***/ },
-/* 273 */
+/* 297 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	exports.withAuthentication = undefined;
+
+	var _withAuthentication = __webpack_require__(298);
+
+	var _withAuthentication2 = _interopRequireDefault(_withAuthentication);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	exports.withAuthentication = _withAuthentication2.default;
+
+/***/ },
+/* 298 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	exports.default = withAuthentication;
+
+	var _react = __webpack_require__(1);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	var _reactRedux = __webpack_require__(172);
+
+	var _reactRouter = __webpack_require__(198);
+
+	var _sessionActions = __webpack_require__(290);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	function withAuthentication(WrappedComponent) {
+	    var AuthComponent = _react2.default.createClass({
+	        displayName: "AuthComponent",
+
+	        propTypes: {
+	            isAuthenticated: _react2.default.PropTypes.bool,
+	            redirectAfterLogin: _react2.default.PropTypes.string,
+	            location: _react2.default.PropTypes.shape({
+	                pathname: _react2.default.PropTypes.string
+	            }),
+	            onRedirectToLogin: _react2.default.PropTypes.func
+	        },
+
+	        componentWillMount: function componentWillMount() {
+	            if (!this.props.isAuthenticated) {
+	                this.redirectIfGuest();
+	            }
+	        },
+	        componentWillReceiveProps: function componentWillReceiveProps(nextProps) {
+	            if (!nextProps.isAuthenticated) {
+	                this.redirectIfGuest();
+	            }
+	        },
+	        redirectIfGuest: function redirectIfGuest() {
+	            this.props.onRedirectToLogin(this.props.location.pathname);
+	            _reactRouter.browserHistory.push("/login");
+	        },
+	        render: function render() {
+	            return _react2.default.createElement(
+	                "div",
+	                null,
+	                this.props.isAuthenticated === true ? _react2.default.createElement(WrappedComponent, this.props) : null
+	            );
+	        }
+	    });
+
+	    var mapStateToProps = function mapStateToProps(state) {
+	        return {
+	            isAuthenticated: state.session.isAuthenticated,
+	            redirectAfterLogin: state.session.redirectUrl
+	        };
+	    };
+
+	    var mapDispatchToProps = function mapDispatchToProps(dispatch) {
+	        return {
+	            onRedirectToLogin: function onRedirectToLogin(url) {
+	                return dispatch((0, _sessionActions.setRedirectAfterLogin)(url));
+	            }
+	        };
+	    };
+
+	    return (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)(AuthComponent);
+	}
+
+/***/ },
+/* 299 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -29307,15 +31823,15 @@
 
 	var _redux = __webpack_require__(179);
 
-	var _reduxThunk = __webpack_require__(274);
+	var _reduxThunk = __webpack_require__(300);
 
 	var _reduxThunk2 = _interopRequireDefault(_reduxThunk);
 
-	var _reduxLogger = __webpack_require__(275);
+	var _reduxLogger = __webpack_require__(301);
 
 	var _reduxLogger2 = _interopRequireDefault(_reduxLogger);
 
-	var _reducers = __webpack_require__(276);
+	var _reducers = __webpack_require__(302);
 
 	var _reducers2 = _interopRequireDefault(_reducers);
 
@@ -29324,13 +31840,15 @@
 	function configureStore(initialState) {
 	    var loggerMiddleware = (0, _reduxLogger2.default)();
 
-	    var createStoreWithMiddleware = (0, _redux.applyMiddleware)(loggerMiddleware, _reduxThunk2.default)(_redux.createStore);
+	    var createStoreWithMiddleware = (0, _redux.applyMiddleware)(
+	    // loggerMiddleware,
+	    _reduxThunk2.default)(_redux.createStore);
 
 	    return createStoreWithMiddleware(_reducers2.default, initialState);
 	}
 
 /***/ },
-/* 274 */
+/* 300 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -29358,7 +31876,7 @@
 	exports['default'] = thunk;
 
 /***/ },
-/* 275 */
+/* 301 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -29591,7 +32109,7 @@
 	module.exports = createLogger;
 
 /***/ },
-/* 276 */
+/* 302 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -29602,28 +32120,33 @@
 
 	var _redux = __webpack_require__(179);
 
-	var _busyReducer = __webpack_require__(277);
+	var _busyReducer = __webpack_require__(303);
 
 	var _busyReducer2 = _interopRequireDefault(_busyReducer);
 
-	var _productDetailsReducer = __webpack_require__(280);
+	var _productDetailsReducer = __webpack_require__(304);
 
 	var _productDetailsReducer2 = _interopRequireDefault(_productDetailsReducer);
 
-	var _productListReducer = __webpack_require__(279);
+	var _productListReducer = __webpack_require__(305);
 
 	var _productListReducer2 = _interopRequireDefault(_productListReducer);
+
+	var _sessionReducer = __webpack_require__(306);
+
+	var _sessionReducer2 = _interopRequireDefault(_sessionReducer);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	exports.default = (0, _redux.combineReducers)({
 	    busy: _busyReducer2.default,
 	    selectedProduct: _productDetailsReducer2.default,
-	    products: _productListReducer2.default
+	    products: _productListReducer2.default,
+	    session: _sessionReducer2.default
 	});
 
 /***/ },
-/* 277 */
+/* 303 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -29632,7 +32155,7 @@
 	    value: true
 	});
 
-	var _actionIdentifiers = __webpack_require__(265);
+	var _actionIdentifiers = __webpack_require__(279);
 
 	var initialState = 0;
 
@@ -29653,8 +32176,7 @@
 	};
 
 /***/ },
-/* 278 */,
-/* 279 */
+/* 304 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -29663,35 +32185,7 @@
 	    value: true
 	});
 
-	var _actionIdentifiers = __webpack_require__(265);
-
-	var initialState = [];
-
-	exports.default = function () {
-	    var state = arguments.length <= 0 || arguments[0] === undefined ? initialState : arguments[0];
-	    var action = arguments[1];
-
-	    switch (action.type) {
-
-	        case _actionIdentifiers.GET_PRODUCTS_COMPLETED:
-	            return action.products;
-
-	        default:
-	            return state;
-	    }
-	};
-
-/***/ },
-/* 280 */
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
-
-	Object.defineProperty(exports, "__esModule", {
-	    value: true
-	});
-
-	var _actionIdentifiers = __webpack_require__(265);
+	var _actionIdentifiers = __webpack_require__(279);
 
 	var initialState = {};
 
@@ -29713,7 +32207,7 @@
 	};
 
 /***/ },
-/* 281 */
+/* 305 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -29722,62 +32216,65 @@
 	    value: true
 	});
 
-	var _react = __webpack_require__(1);
+	var _actionIdentifiers = __webpack_require__(279);
 
-	var _react2 = _interopRequireDefault(_react);
+	var initialState = [];
 
-	var _reactRedux = __webpack_require__(172);
+	exports.default = function () {
+	    var state = arguments.length <= 0 || arguments[0] === undefined ? initialState : arguments[0];
+	    var action = arguments[1];
 
-	var _productActions = __webpack_require__(264);
+	    switch (action.type) {
 
-	var _helpers = __webpack_require__(266);
+	        case _actionIdentifiers.GET_PRODUCTS_COMPLETED:
+	            return action.products;
 
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-	var ProductDetails = _react2.default.createClass({
-	    displayName: "ProductDetails",
-	    componentDidMount: function componentDidMount() {
-	        console.log(this.props);
-	        this.props.dispatch(_helpers.Api.get(_productActions.fetchProduct, { id: this.props.params.id }));
-	    },
-	    render: function render() {
-	        var product = this.props.product;
-	        return _react2.default.createElement(
-	            "div",
-	            null,
-	            _react2.default.createElement(
-	                "h1",
-	                null,
-	                "Product Details!"
-	            ),
-	            _react2.default.createElement(
-	                "h2",
-	                null,
-	                product.name
-	            ),
-	            _react2.default.createElement(
-	                "p",
-	                null,
-	                "Price: $",
-	                product.price
-	            ),
-	            _react2.default.createElement(
-	                "p",
-	                null,
-	                "Description: ",
-	                product.description
-	            )
-	        );
+	        default:
+	            return state;
 	    }
+	};
+
+/***/ },
+/* 306 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
 	});
 
-	function mapStateToProps(state) {
-	    return {
-	        product: state.selectedProduct
-	    };
-	}
+	var _actionIdentifiers = __webpack_require__(279);
 
-	exports.default = (0, _reactRedux.connect)(mapStateToProps)(ProductDetails);
+	var initialState = { token: null };
+
+	exports.default = function () {
+	    var state = arguments.length <= 0 || arguments[0] === undefined ? initialState : arguments[0];
+	    var action = arguments[1];
+
+	    switch (action.type) {
+
+	        case _actionIdentifiers.LOGIN_COMPLETED:
+	            return Object.assign({}, state, {
+	                token: action.token,
+	                isAuthenticated: true
+	            });
+
+	        case _actionIdentifiers.LOGOUT:
+	            return {
+	                token: null,
+	                isAuthenticated: false
+	            };
+
+	        case _actionIdentifiers.SET_REDIRECT_AFTER_LOGIN:
+	            return Object.assign({}, state, {
+	                redirectUrl: action.redirectUrl
+	            });
+
+	        default:
+	            return state;
+	    }
+	};
 
 /***/ }
 /******/ ]);

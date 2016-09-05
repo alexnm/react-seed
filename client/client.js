@@ -8,7 +8,7 @@ import configureStore from "../app/store";
 const store = configureStore( window.INITIAL_STATE );
 const rootHtml = (
     <Provider store={ store }>
-        <Router history={ browserHistory } routes={ routes( store.dispatch, store.getState ) } />
+        <Router history={ browserHistory } routes={ routes } />
     </Provider>
 );
 
