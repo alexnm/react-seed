@@ -6,11 +6,12 @@ import Formsy from "formsy-react";
 import Dictionary from "../../dictionary";
 import { Api } from "../../helpers";
 import { login } from "../../actions/sessionActions";
+import { InputField } from "../components/formElements";
 
 const Login = React.createClass( {
     componentWillReceiveProps( nextProps ) {
-        if ( !this.props.isAuthenticated && nextProps.isAuthenticated && this.props.redirectAfterLogin ) {
-            browserHistory.push( this.props.redirectAfterLogin );
+        if ( !this.props.isAuthenticated && nextProps.isAuthenticated ) {
+            browserHistory.push( this.props.redirectAfterLogin || "/" );
         }
     },
 
@@ -23,11 +24,11 @@ const Login = React.createClass( {
                 <Formsy.Form onValidSubmit={ this.props.onSubmitLogin }>
                     <div>
                         <label htmlFor="username">Username: </label>
-                        <input type="text" name="username" />
+                        <InputField type="text" name="username" />
                     </div>
                     <div>
                         <label htmlFor="password">Password: </label>
-                        <input type="password" name="password" />
+                        <InputField type="password" name="password" />
                     </div>
 
                     <button type="submit">Submit</button>
@@ -44,8 +45,7 @@ const mapStateToProps = ( state ) => ( {
 
 const mapDispatchToProps = ( dispatch ) => ( {
     onSubmitLogin: ( model ) => {
-        const body = { };
-        dispatch( Api.post( login )( null, body ) );
+        dispatch( Api.post( login )( null, model ) );
     },
 } );
 

@@ -13,7 +13,13 @@ router.get( "/products/:id", ( req, res ) => {
 } );
 
 router.post( "/login", ( req, res ) => {
-    setTimeout( ( ) => res.json( { token: "123" } ), 500 );
+    setTimeout( ( ) => {
+        if ( req.body.username === "alex" && req.body.password === "secret" ) {
+            return res.json( { success: true } );
+        }
+
+        return res.status( 401 ).json( { success: false } );
+    }, 500 );
 } );
 
 function productOverview( product ) {

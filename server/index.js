@@ -1,4 +1,5 @@
 import express from "express";
+import bodyParser from "body-parser";
 import React from "react";
 import { renderToString } from "react-dom/server";
 import { RouterContext, match } from "react-router";
@@ -11,6 +12,7 @@ import configureStore from "../app/store";
 
 const app = express( );
 
+app.use( bodyParser.json( ) );
 app.use( "/favicon.ico", express.static( "favicon.ico" ) );
 app.use( "/dist", express.static( "dist" ) );
 
