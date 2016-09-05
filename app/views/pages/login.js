@@ -2,11 +2,10 @@ import React from "react";
 import { browserHistory } from "react-router";
 import { connect } from "react-redux";
 import Helmet from "react-helmet";
-import Formsy from "formsy-react";
 import Dictionary from "../../dictionary";
 import { Api } from "../../helpers";
 import { login } from "../../actions/sessionActions";
-import { InputField } from "../components/formElements";
+import { LoginForm } from "../components/forms";
 
 const Login = React.createClass( {
     componentWillReceiveProps( nextProps ) {
@@ -21,18 +20,7 @@ const Login = React.createClass( {
                 <Helmet title={ Dictionary.login.explanation } />
                 <h1>{ Dictionary.login.title }</h1>
 
-                <Formsy.Form onValidSubmit={ this.props.onSubmitLogin }>
-                    <div>
-                        <label htmlFor="username">Username: </label>
-                        <InputField type="text" name="username" />
-                    </div>
-                    <div>
-                        <label htmlFor="password">Password: </label>
-                        <InputField type="password" name="password" />
-                    </div>
-
-                    <button type="submit">Submit</button>
-                </Formsy.Form>
+                <LoginForm onSubmit={ this.props.onSubmitLogin } />
             </div>
         );
     },
