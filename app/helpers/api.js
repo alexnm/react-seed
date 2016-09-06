@@ -31,7 +31,7 @@ function handleResponse( response, action, dispatch ) {
     dispatch( action.completed( response ) );
 }
 
-function handleError( response, action, dispatch ) {
+function handleError( { status, response }, action, dispatch ) {
     dispatch( apiCallEnded );
     dispatch( action.failed( response ) );
 }

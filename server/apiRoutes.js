@@ -18,7 +18,7 @@ router.post( "/login", ( req, res ) => {
             return res.json( { success: true } );
         }
 
-        return res.status( 401 ).json( { success: false } );
+        return res.status( 401 ).json( { success: false, error: "Invalid credentials" } );
     }, 500 );
 } );
 

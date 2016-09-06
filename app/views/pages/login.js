@@ -20,7 +20,7 @@ const Login = React.createClass( {
                 <Helmet title={ Dictionary.login.explanation } />
                 <h1>{ Dictionary.login.title }</h1>
 
-                <LoginForm onSubmit={ this.props.onSubmitLogin } />
+                <LoginForm onSubmit={ this.props.onSubmitLogin } serverError={ this.props.serverError } />
             </div>
         );
     },
@@ -29,6 +29,7 @@ const Login = React.createClass( {
 const mapStateToProps = ( state ) => ( {
     isAuthenticated: state.session.isAuthenticated,
     redirectAfterLogin: state.session.redirectUrl,
+    serverError: state.serverError,
 } );
 
 const mapDispatchToProps = ( dispatch ) => ( {

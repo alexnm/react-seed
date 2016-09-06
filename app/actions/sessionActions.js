@@ -9,9 +9,9 @@ export const login = {
         type: Actions.LOGIN_COMPLETED,
         token: response.token,
     } ),
-    failed: ( error ) => ( {
+    failed: ( response ) => ( {
         type: Actions.LOGIN_FAILED,
-        message: error.message,
+        message: response.error,
     } ),
 };
 

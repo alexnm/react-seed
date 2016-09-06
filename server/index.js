@@ -47,6 +47,7 @@ function renderPage( reactDom, head, initialState ) {
                 ${ head.title.toString( ) }
                 ${ head.meta.toString( ) }
                 ${ head.link.toString( ) }
+                <link rel="stylesheet" href="/dist/style.css"/>
             </head>
             <body>
                 <div id="react-root">${ reactDom }</div>
