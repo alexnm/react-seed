@@ -2,7 +2,9 @@ import * as Actions from "../actionIdentifiers";
 
 export const addToCart = product => ( {
     type: Actions.ADD_TO_CART,
-    product,
+    payload: {
+        product,
+    },
 } );
 
 export const fetchProduct = {
@@ -12,11 +14,15 @@ export const fetchProduct = {
     },
     completed: ( response ) => ( {
         type: Actions.GET_PRODUCT_COMPLETED,
-        product: response.product,
+        payload: {
+            product: response.product,
+        },
     } ),
     failed: ( error ) => ( {
         type: Actions.GET_PRODUCT_FAILED,
-        message: error.message,
+        payload: {
+            message: error.message,
+        },
     } ),
 };
 
@@ -27,10 +33,14 @@ export const fetchProducts = {
     },
     completed: ( response ) => ( {
         type: Actions.GET_PRODUCTS_COMPLETED,
-        products: response.products,
+        payload: {
+            products: response.products,
+        },
     } ),
     failed: ( error ) => ( {
         type: Actions.GET_PRODUCTS_FAILED,
-        message: error.message,
+        payload: {
+            message: error.message,
+        },
     } ),
 };

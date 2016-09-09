@@ -1,26 +1,18 @@
 import { LOGIN_COMPLETED, LOGOUT, SET_REDIRECT_AFTER_LOGIN } from "../actionIdentifiers";
+import createReducer from "./createReducer";
 
 const initialState = { token: null };
 
-export default ( state = initialState, action ) => {
-    switch ( action.type ) {
-
-    case LOGIN_COMPLETED:
-        return Object.assign( { }, state, {
-            token: action.token,
-            isAuthenticated: true,
-        } );
-
-    case LOGOUT: return {
+export default createReducer( initialState )( {
+    [ LOGIN_COMPLETED ]: ( state, payload ) => Object.assign( { }, state, {
+        token: payload.token,
+        isAuthenticated: true,
+    } ),
+    [ LOGOUT ]: ( ) => ( {
         token: null,
         isAuthenticated: false,
-    };
-
-    case SET_REDIRECT_AFTER_LOGIN:
-        return Object.assign( { }, state, {
-            redirectUrl: action.redirectUrl,
-        } );
-
-    default: return state;
-    }
-};
+    } ),
+    [ SET_REDIRECT_AFTER_LOGIN ]: ( state, payload ) => Object.assign( { }, state, {
+        redirectUrl: payload.redirectUrl,
+    } ),
+} );

@@ -7,11 +7,15 @@ export const login = {
     },
     completed: ( response ) => ( {
         type: Actions.LOGIN_COMPLETED,
-        token: response.token,
+        payload: {
+            token: response.token,
+        },
     } ),
     failed: ( response ) => ( {
         type: Actions.LOGIN_FAILED,
-        message: response.error,
+        payload: {
+            message: response.error,
+        },
     } ),
 };
 
@@ -21,5 +25,7 @@ export const logout = {
 
 export const setRedirectAfterLogin = ( redirectUrl ) => ( {
     type: Actions.SET_REDIRECT_AFTER_LOGIN,
-    redirectUrl,
+    payload: {
+        redirectUrl,
+    },
 } );

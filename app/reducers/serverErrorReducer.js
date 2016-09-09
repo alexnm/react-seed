@@ -1,13 +1,8 @@
 import { LOGIN_FAILED } from "../actionIdentifiers";
+import createReducer from "./createReducer";
 
 const initialState = "";
 
-export default ( state = initialState, action ) => {
-    switch ( action.type ) {
-
-    case LOGIN_FAILED:
-        return action.message;
-
-    default: return state;
-    }
-};
+export default createReducer( initialState )( {
+    [ LOGIN_FAILED ]: ( state, payload ) => payload.message,
+} );

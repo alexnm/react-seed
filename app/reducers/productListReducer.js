@@ -1,13 +1,8 @@
 import { GET_PRODUCTS_COMPLETED } from "../actionIdentifiers";
+import createReducer from "./createReducer";
 
 const initialState = [ ];
 
-export default ( state = initialState, action ) => {
-    switch ( action.type ) {
-
-    case GET_PRODUCTS_COMPLETED:
-        return action.products;
-
-    default: return state;
-    }
-};
+export default createReducer( initialState )( {
+    [ GET_PRODUCTS_COMPLETED ]: ( state, payload ) => payload.products,
+} );

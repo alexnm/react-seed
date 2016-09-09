@@ -8,6 +8,13 @@ import { login } from "../../actions/sessionActions";
 import { LoginForm } from "../components/forms";
 
 const Login = React.createClass( {
+    propTypes: {
+        isAuthenticated: React.PropTypes.bool,
+        redirectAfterLogin: React.PropTypes.string,
+        onSubmitLogin: React.PropTypes.func,
+        serverError: React.PropTypes.string,
+    },
+
     componentWillReceiveProps( nextProps ) {
         if ( !this.props.isAuthenticated && nextProps.isAuthenticated ) {
             browserHistory.push( this.props.redirectAfterLogin || "/" );
