@@ -1,20 +1,27 @@
 import React from "react";
 import { connect } from "react-redux";
 import Helmet from "react-helmet";
-import { Api } from "../../helpers";
+import Dictionary from "../../dictionary";
+import { CartItem } from "../components";
+import { removeFromCart } from "../../actions/productActions";
 
-const Cart = React.createClass( {
-    propTypes: {
-    },
+const Cart = ( { items, onRemoveFromCart } ) => (
+    <div>
+        <Helmet title={ Dictionary.cart.myCart } />
+        <h1>{ Dictionary.cart.myCart }</h1>
 
-    render( ) {
-        return (
-            <div>
-                <Helmet title="My shopping cart" />
-                <h1>My shopping cart</h1>
-            </div>
-        );
-    },
+        { items.map( ( item, index ) => (
+            <CartItem item={ item } key={ index } index={ index } onRemoveItem={ onRemoveFromCart } />
+        ) ) }
+    </div>
+);
+
+const mapStateToProps = ( state ) => ( {
+    items: state.cart,
 } );
 
-export default connect( null )( Cart );
+const mapDispatchToProps = ( dispatch ) => ( {
+    onRemoveFromCart: ( index ) => dispatch( removeFromCart( index ) ),
+} );
+
+export default connect( mapStateToProps, mapDispatchToProps )( Cart );

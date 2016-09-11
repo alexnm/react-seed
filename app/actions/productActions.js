@@ -7,6 +7,13 @@ export const addToCart = product => ( {
     },
 } );
 
+export const removeFromCart = index => ( {
+    type: Actions.REMOVE_FROM_CART,
+    payload: {
+        index,
+    },
+} );
+
 export const fetchProduct = {
     name: Actions.GET_PRODUCT,
     started: {

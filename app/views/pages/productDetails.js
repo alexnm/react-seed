@@ -1,7 +1,9 @@
 import React from "react";
 import { connect } from "react-redux";
-import { fetchProduct } from "../../actions/productActions";
+import { addToCart, fetchProduct } from "../../actions/productActions";
 import { Api } from "../../helpers";
+import Dictionary from "../../dictionary";
+import { Display } from "../utilities";
 
 const loadProduct = Api.get( fetchProduct );
 
@@ -18,18 +20,23 @@ const ProductDetails = React.createClass( {
 
     componentDidMount( ) {
         if ( this.props.product.id !== parseInt( this.props.params.id, 10 ) ) {
-            this.props.dispatch( loadProduct( { id: this.props.params.id } ) );
+            this.props.fetchProduct( this.props.params.id );
         }
     },
 
     render( ) {
-        const product = this.props.product;
+        const { product, isAuthenticated, onAddToCart } = this.props;
         return (
             <div>
                 <h1>Product Details!</h1>
                 <h2>{ product.name }</h2>
                 <p>Price: ${ product.price }</p>
                 <p>Description: { product.description }</p>
+                { isAuthenticated &&
+                    <span className="link" onClick={ ( ) => onAddToCart( product ) }>
+                        { Dictionary.cart.add }
+                    </span>
+                }
             </div>
         );
     },
@@ -37,6 +44,12 @@ const ProductDetails = React.createClass( {
 
 const mapStateToProps = ( state ) => ( {
     product: state.selectedProduct,
+    isAuthenticated: state.session.isAuthenticated,
 } );
 
-export default connect( mapStateToProps )( ProductDetails );
+const mapDispatchToProps = ( dispatch ) => ( {
+    onAddToCart: ( product ) => dispatch( addToCart( product ) ),
+    fetchProduct: ( id ) => dispatch( loadProduct( { id } ) ),
+} );
+
+export default connect( mapStateToProps, mapDispatchToProps )( ProductDetails );
