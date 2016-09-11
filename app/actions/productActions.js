@@ -1,7 +1,7 @@
 import * as Actions from "../actionIdentifiers";
 import { Notification } from "../helpers";
 
-const addToCartAction = product => ( {
+const addToCartAction = ( product ) => ( {
     type: Actions.ADD_TO_CART,
     payload: {
         product,
@@ -13,7 +13,7 @@ export const addToCart = ( product ) => ( dispatch ) => {
     dispatch( Notification.info( "Product added to cart" ) );
 };
 
-export const removeFromCart = index => ( {
+export const removeFromCart = ( index ) => ( {
     type: Actions.REMOVE_FROM_CART,
     payload: {
         index,

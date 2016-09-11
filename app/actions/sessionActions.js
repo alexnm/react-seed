@@ -1,4 +1,5 @@
 import * as Actions from "../actionIdentifiers";
+import { Notification } from "../helpers";
 
 export const login = {
     name: Actions.LOGIN,
@@ -19,8 +20,13 @@ export const login = {
     } ),
 };
 
-export const logout = {
+const logoutAction = {
     type: Actions.LOGOUT,
+};
+
+export const logout = ( dispatch ) => {
+    dispatch( logoutAction );
+    dispatch( Notification.info( "Successfully logged out!" ) );
 };
 
 export const setRedirectAfterLogin = ( redirectUrl ) => ( {
