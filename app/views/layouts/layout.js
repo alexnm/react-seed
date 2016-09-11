@@ -1,6 +1,7 @@
 import React from "react";
 import { connect } from "react-redux";
 import { Link } from "react-router";
+import { NotificationCenter } from "../components";
 
 const Layout = ( { showSpinner, children } ) => {
     const spinner = showSpinner ? ( <span>Loading...</span> ) : "";
@@ -17,6 +18,7 @@ const Layout = ( { showSpinner, children } ) => {
                 { spinner }
                 { children }
             </div>
+            <NotificationCenter />
         </div>
     );
 };

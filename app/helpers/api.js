@@ -1,4 +1,5 @@
 import fetch from "./fetch";
+import Notification from "./notification";
 import { apiCallStarted, apiCallEnded } from "../actions/apiActions";
 import { GET_PRODUCT, GET_PRODUCTS, LOGIN } from "../actionIdentifiers";
 
@@ -34,6 +35,7 @@ function handleResponse( response, action, dispatch ) {
 function handleError( { status, response }, action, dispatch ) {
     dispatch( apiCallEnded );
     dispatch( action.failed( response ) );
+    dispatch( Notification.error( response.error ) );
 }
 
 export default {

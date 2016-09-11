@@ -28,3 +28,28 @@
 .cart-item .link {
     margin-left: 10px;
 }
+
+.notification-center {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+}
+
+.notification-center .message {
+    margin: 10px;
+    color: white;
+    font-weight: bold;
+    padding: 10px;
+}
+
+.notification-center .message.info {
+    background-color: green;
+}
+
+.notification-center .message.warning {
+    background-color: orange;
+}
+
+.notification-center .message.error {
+    background-color: red;
+}
