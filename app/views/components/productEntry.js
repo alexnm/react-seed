@@ -2,7 +2,7 @@ import React from "react";
 import { Link } from "react-router";
 
 const ProductEntry = ( { product } ) => (
-    <div>
+    <div className="product-box">
         <Link to={ `/products/${ product.id }` }>
             { product.name }
         </Link> - <span>{ product.price }</span>

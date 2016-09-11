@@ -10,3 +10,21 @@
     border-radius: 10px;
     padding: 5px;
 }
+
+.navlink {
+    color: #333;
+    margin: 5px;
+    text-decoration: none;
+}
+
+.product-box {
+    margin: 5px;
+}
+
+.cart-item {
+    margin: 15px;
+}
+
+.cart-item .link {
+    margin-left: 10px;
+}

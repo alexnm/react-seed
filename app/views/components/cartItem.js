@@ -3,7 +3,7 @@ import { Link } from "react-router";
 import Dictionary from "../../dictionary";
 
 const CartItem = ( { item, index, onRemoveItem } ) => (
-    <div>
+    <div className="cart-item">
         <Link to={ `/products/${ item.id }` }>
             { item.name }
         </Link> - <span>{ item.price }</span>

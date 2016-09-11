@@ -8,9 +8,10 @@ const Layout = ( { showSpinner, children } ) => {
     return (
         <div>
             <div>
-                <Link to="/">Home</Link>
-                <Link to="/products">Products</Link>
-                <Link to="/my-cart">My Cart</Link>
+                <Link className="navlink" to="/">Home</Link>
+                <Link className="navlink" to="/products">Products</Link>
+                <Link className="navlink" to="/my-cart">My Cart</Link>
+                <Link className="navlink" to="/login">Login</Link>
             </div>
             <div>
                 { spinner }

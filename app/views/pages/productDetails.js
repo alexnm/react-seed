@@ -3,7 +3,6 @@ import { connect } from "react-redux";
 import { addToCart, fetchProduct } from "../../actions/productActions";
 import { Api } from "../../helpers";
 import Dictionary from "../../dictionary";
-import { Display } from "../utilities";
 
 const loadProduct = Api.get( fetchProduct );
 

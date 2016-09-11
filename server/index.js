@@ -7,7 +7,7 @@ import { Provider } from "react-redux";
 import Helmet from "react-helmet";
 
 import apiRoutes from "./apiRoutes";
-import routes from "../app/routes";
+import createRoutes from "../app/routes";
 import configureStore from "../app/store";
 
 const app = express( );
@@ -20,6 +20,7 @@ app.use( "/api", apiRoutes );
 
 app.use( ( req, res ) => {
     const store = configureStore( );
+    const routes = createRoutes( store.dispatch );
 
     match( { routes, location: req.url }, ( error, redirect, props ) => {
         fetchDataForComponents( props, store ).then( ( ) => {
