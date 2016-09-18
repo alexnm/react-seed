@@ -1,10 +1,12 @@
 import fetch from "./fetch";
 import Notification from "./notification";
 import { apiCallStarted, apiCallEnded } from "../ducks/busy";
+import { GET_PRODUCTS } from "../ducks/productList";
+import { GET_PRODUCT } from "../ducks/productDetails";
+import { LOGIN } from "../ducks/session";
 
 const apiCall = ( method ) => ( action ) => ( params, body ) => ( dispatch ) => {
-    const baseUrl = getBaseUrl( );
-    const url = action.url( baseUrl, params );
+    const url = urlMapper( action, params );
     dispatch( action.started );
     dispatch( apiCallStarted );
     return fetch( url, method, body ).then(
@@ -12,6 +14,16 @@ const apiCall = ( method ) => ( action ) => ( params, body ) => ( dispatch ) => 
         err => handleError( err, action, dispatch )
     );
 };
+
+function urlMapper( action, params ) {
+    const baseUrl = getBaseUrl( );
+    switch ( action.name ) {
+    case GET_PRODUCTS: return `${ baseUrl }/products`;
+    case GET_PRODUCT: return `${ baseUrl }/products/${ params.id }`;
+    case LOGIN: return `${ baseUrl }/login`;
+    default: throw new Error( "action does not have a url defined in api.js" );
+    }
+}
 
 function getBaseUrl( ) {
     return typeof document === "undefined" ? "http://localhost:1234/api" : "/api";
