@@ -1,7 +1,7 @@
 import React from "react";
 import { connect } from "react-redux";
 import { browserHistory } from "react-router";
-import { setRedirectAfterLogin } from "../actions/sessionActions";
+import { setRedirectAfterLogin } from "../../ducks/session";
 
 export default function withAuthentication( WrappedComponent ) {
     const AuthComponent = React.createClass( {

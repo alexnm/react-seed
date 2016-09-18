@@ -4,7 +4,7 @@ import { connect } from "react-redux";
 import Helmet from "react-helmet";
 import Dictionary from "../../dictionary";
 import { Api } from "../../helpers";
-import { login } from "../../actions/sessionActions";
+import { login } from "../../ducks/session";
 import { LoginForm } from "../components/forms";
 
 const Login = React.createClass( {

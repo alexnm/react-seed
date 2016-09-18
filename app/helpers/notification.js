@@ -1,4 +1,4 @@
-import { pushNotification, dismissNotification } from "../actions/notificationActions";
+import { pushNotification, dismissNotification } from "../ducks/notifications";
 
 export const notification = ( type ) => ( text, timeout = 3000 ) => ( dispatch ) => {
     const notificationObj = pushNotification( type, text );

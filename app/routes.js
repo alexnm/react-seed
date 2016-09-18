@@ -2,8 +2,8 @@ import React from "react";
 import { IndexRoute, Route } from "react-router";
 import { Cart, Home, Login, NotFound, ProductList, ProductDetails } from "./views/pages";
 import Layout from "./views/layouts/layout";
-import { withAuthentication } from "./enhancers";
-import { setRedirectAfterLogin } from "./actions/sessionActions";
+import { withAuthentication } from "./views/enhancers";
+import { setRedirectAfterLogin } from "./ducks/session";
 
 export default function createRoutes( dispatch ) {
     const setRedirectUrl = ( prevState, nextState ) => {

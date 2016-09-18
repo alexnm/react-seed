@@ -1,7 +1,7 @@
 import React from "react";
 import { connect } from "react-redux";
 import Helmet from "react-helmet";
-import { fetchProducts } from "../../actions/productActions";
+import { fetchProducts } from "../../ducks/productList";
 import { Api } from "../../helpers";
 import { ProductEntry } from "../components";
 

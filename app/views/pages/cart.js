@@ -3,7 +3,7 @@ import { connect } from "react-redux";
 import Helmet from "react-helmet";
 import Dictionary from "../../dictionary";
 import { CartItem } from "../components";
-import { removeFromCart } from "../../actions/productActions";
+import { removeFromCart } from "../../ducks/cart";
 
 const Cart = ( { items, onRemoveFromCart } ) => (
     <div>

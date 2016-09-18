@@ -2,7 +2,7 @@ import React from "react";
 import { connect } from "react-redux";
 import { Link } from "react-router";
 import { NotificationCenter } from "../components";
-import { logout } from "../../actions/sessionActions";
+import { logout } from "../../ducks/session";
 
 const Layout = ( { showSpinner, isAuthenticated, children, onLogout } ) => {
     const spinner = showSpinner ? ( <span>Loading...</span> ) : "";

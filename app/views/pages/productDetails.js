@@ -1,6 +1,7 @@
 import React from "react";
 import { connect } from "react-redux";
-import { addToCart, fetchProduct } from "../../actions/productActions";
+import { fetchProduct } from "../../ducks/productDetails";
+import { addToCart } from "../../ducks/cart";
 import { Api } from "../../helpers";
 import Dictionary from "../../dictionary";
 
