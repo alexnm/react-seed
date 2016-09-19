@@ -1,4 +1,4 @@
-import { createReducer } from "../utilities";
+import { createReducer } from "./utilities";
 
 const DISMISS_NOTIFICATION = "DISMISS_NOTIFICATION";
 const PUSH_NOTIFICATION = "PUSH_NOTIFICATION";

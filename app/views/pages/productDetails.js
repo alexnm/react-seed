@@ -2,7 +2,7 @@ import React from "react";
 import { connect } from "react-redux";
 import { fetchProduct } from "../../ducks/productDetails";
 import { addToCart } from "../../ducks/cart";
-import { Api } from "../../helpers";
+import { Api } from "../../utilities";
 import Dictionary from "../../dictionary";
 
 const loadProduct = Api.get( fetchProduct );

@@ -1,13 +1,14 @@
-import { createReducer, createAsyncAction } from "../utilities";
+import { createReducer, createAsyncAction } from "./utilities";
 
-export const GET_PRODUCT = "GET_PRODUCT";
+const GET_PRODUCT = "GET_PRODUCT";
 const GET_PRODUCT_COMPLETED = "GET_PRODUCT_COMPLETED";
 
 const mapResponseToPayload = ( response ) => ( {
     product: response.product,
 } );
 
-export const fetchProduct = createAsyncAction( GET_PRODUCT, mapResponseToPayload );
+const urlMapper = ( params ) => `/products/${ params.id }`;
+export const fetchProduct = createAsyncAction( GET_PRODUCT, urlMapper, mapResponseToPayload );
 
 const initialState = { };
 

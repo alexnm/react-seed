@@ -2,8 +2,9 @@ const defaultErrorMap = ( error ) => ( {
     message: error.message,
 } );
 
-export default ( type, mapResponseToPayload, mapErrorToMessage = defaultErrorMap ) => ( {
+export default ( type, urlMapper, mapResponseToPayload, mapErrorToMessage = defaultErrorMap ) => ( {
     name: type,
+    urlMapper,
     started: {
         type,
     },

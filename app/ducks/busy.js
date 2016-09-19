@@ -1,4 +1,4 @@
-import { createReducer } from "../utilities";
+import { createReducer } from "./utilities";
 
 const API_CALL_STARTED = "API_CALL_STARTED";
 const API_CALL_ENDED = "API_CALL_ENDED";

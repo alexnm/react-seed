@@ -3,7 +3,7 @@ import { browserHistory } from "react-router";
 import { connect } from "react-redux";
 import Helmet from "react-helmet";
 import Dictionary from "../../dictionary";
-import { Api } from "../../helpers";
+import { Api } from "../../utilities";
 import { login } from "../../ducks/session";
 import { LoginForm } from "../components/forms";
 

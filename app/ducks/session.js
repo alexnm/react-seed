@@ -1,6 +1,6 @@
-import { createReducer, createAsyncAction } from "../utilities";
+import { createReducer, createAsyncAction } from "./utilities";
 
-export const LOGIN = "LOGIN";
+const LOGIN = "LOGIN";
 const LOGIN_COMPLETED = "LOGIN_COMPLETED";
 const LOGOUT = "LOGOUT";
 const SET_REDIRECT_AFTER_LOGIN = "SET_REDIRECT_AFTER_LOGIN";
@@ -9,7 +9,8 @@ const mapResponseToPayload = ( response ) => ( {
     token: response.token,
 } );
 
-export const login = createAsyncAction( LOGIN, mapResponseToPayload );
+const urlMapper = ( ) => "/login/";
+export const login = createAsyncAction( LOGIN, urlMapper, mapResponseToPayload );
 
 const logoutAction = {
     type: LOGOUT,
