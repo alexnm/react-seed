@@ -1,5 +1,6 @@
 import express from "express";
 import bodyParser from "body-parser";
+import cookieParser from "cookie-parser";
 import React from "react";
 import { renderToString } from "react-dom/server";
 import { RouterContext, match } from "react-router";
@@ -9,10 +10,12 @@ import Helmet from "react-helmet";
 import apiRoutes from "./apiRoutes";
 import createRoutes from "../app/routes";
 import configureStore from "../app/store";
+import { initializeSession } from "../app/ducks/session";
 
 const app = express( );
 
 app.use( bodyParser.json( ) );
+app.use( cookieParser( ) );
 app.use( "/favicon.ico", express.static( "favicon.ico" ) );
 app.use( "/dist", express.static( "dist" ) );
 
@@ -21,6 +24,11 @@ app.use( "/api", apiRoutes );
 app.use( ( req, res ) => {
     const store = configureStore( );
     const routes = createRoutes( store.dispatch );
+
+    const token = req.cookies.token;
+    if ( token ) {
+        store.dispatch( initializeSession( token ) );
+    }
 
     match( { routes, location: req.url }, ( error, redirect, props ) => {
         fetchDataForComponents( props, store ).then( ( ) => {

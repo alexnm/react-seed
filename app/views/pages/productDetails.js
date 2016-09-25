@@ -30,7 +30,8 @@ const ProductDetails = React.createClass( {
             <div>
                 <h1>Product Details!</h1>
                 <h2>{ product.name }</h2>
-                <p>Price: ${ product.price }</p>
+                <img className="product-image" src={ product.imageUrl } alt={ product.name } />
+                <p>Price: { product.price } €</p>
                 <p>Description: { product.description }</p>
                 { isAuthenticated &&
                     <span className="link" onClick={ ( ) => onAddToCart( product ) }>

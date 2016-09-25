@@ -1,9 +1,11 @@
 import { createReducer, createAsyncAction } from "./utilities";
+import { Notification } from "../utilities";
 
 const LOGIN = "LOGIN";
 const LOGIN_COMPLETED = "LOGIN_COMPLETED";
 const LOGOUT = "LOGOUT";
 const SET_REDIRECT_AFTER_LOGIN = "SET_REDIRECT_AFTER_LOGIN";
+const INITIALIZE_SESSION = "INITIALIZE_SESSION";
 
 const mapResponseToPayload = ( response ) => ( {
     token: response.token,
@@ -28,6 +30,13 @@ export const setRedirectAfterLogin = ( redirectUrl ) => ( {
     },
 } );
 
+export const initializeSession = ( token ) => ( {
+    type: INITIALIZE_SESSION,
+    payload: {
+        token,
+    },
+} );
+
 const initialState = { token: null };
 
 export default createReducer( initialState )( {
@@ -41,5 +50,9 @@ export default createReducer( initialState )( {
     } ),
     [ SET_REDIRECT_AFTER_LOGIN ]: ( state, payload ) => Object.assign( { }, state, {
         redirectUrl: payload.redirectUrl,
+    } ),
+    [ INITIALIZE_SESSION ]: ( state, payload ) => Object.assign( { }, state, {
+        token: payload.token,
+        isAuthenticated: true,
     } ),
 } );

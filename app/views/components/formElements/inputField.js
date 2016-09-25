@@ -10,8 +10,9 @@ const InputField = React.createClass( {
     },
 
     render() {
-        const className = this.showRequired( ) ? "required" : this.showError( ) ? "error" : null;
-        const errorMessage = this.getErrorMessage();
+        const errorClass = this.showError( ) ? "error" : null;
+        const className = this.showRequired( ) ? "required" : errorClass;
+        const errorMessage = this.getErrorMessage( );
 
         return (
             <div className={ className }>

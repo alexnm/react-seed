@@ -1,7 +1,7 @@
 export default {
     home: {
         title: "Welcome to React!",
-        explanation: "This application is created to show some cool features of working with React and Redux.",
+        explanation: "This application is created to show some cool features of React and Redux.",
     },
     login: {
         title: "Login",

@@ -1,6 +1,7 @@
 import { createStore, applyMiddleware, combineReducers } from "redux";
 import thunkMiddleware from "redux-thunk";
 import createLogger from "redux-logger";
+import { persistCart, storeAuthToken } from "./middlewares";
 import busy from "./ducks/busy";
 import cart from "./ducks/cart";
 import notifications from "./ducks/notifications";
@@ -14,7 +15,9 @@ export default function configureStore( initialState ) {
 
     const createStoreWithMiddleware = applyMiddleware(
         loggerMiddleware,
-        thunkMiddleware
+        thunkMiddleware,
+        storeAuthToken,
+        persistCart
     )( createStore );
 
     const combinedReducer = combineReducers( {

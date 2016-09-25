@@ -13,7 +13,7 @@ const CartItem = ( { item, index, onRemoveItem } ) => (
 
 CartItem.propTypes = {
     item: React.PropTypes.object,
-    key: React.PropTypes.number,
+    index: React.PropTypes.number,
     onRemoveItem: React.PropTypes.func,
 };
 

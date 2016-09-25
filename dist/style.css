@@ -22,6 +22,16 @@
     margin: 5px;
 }
 
+.product-box .product-image {
+    width: 100px;
+    vertical-align: middle;
+    margin-right: 20px;
+}
+
+.product-image {
+    width: 200px;
+}
+
 .cart-item {
     margin: 15px;
 }
