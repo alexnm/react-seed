@@ -7,12 +7,14 @@ import { login } from "../../ducks/session";
 import { LoginForm } from "../components/forms";
 import { Router } from "../helpers";
 
+const { bool, string, func } = React.PropTypes;
+
 const Login = React.createClass( {
     propTypes: {
-        isAuthenticated: React.PropTypes.bool,
-        redirectAfterLogin: React.PropTypes.string,
-        onSubmitLogin: React.PropTypes.func,
-        serverError: React.PropTypes.string,
+        isAuthenticated: bool.isRequired,
+        redirectAfterLogin: string.isRequired,
+        onSubmitLogin: func.isRequired,
+        serverError: string.isRequired,
     },
 
     componentWillReceiveProps( nextProps ) {

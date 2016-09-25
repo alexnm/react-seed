@@ -2,13 +2,12 @@ import React from "react";
 import { connect } from "react-redux";
 import { Router } from "../helpers";
 
+const { bool } = React.PropTypes;
+
 export default function withAuthentication( WrappedComponent ) {
     const AuthComponent = React.createClass( {
         propTypes: {
-            isAuthenticated: React.PropTypes.bool,
-            location: React.PropTypes.shape( {
-                pathname: React.PropTypes.string,
-            } ),
+            isAuthenticated: bool.isRequired,
         },
 
         componentWillMount( ) {

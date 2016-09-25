@@ -1,7 +1,12 @@
 import React from "react";
 import Formsy from "formsy-react";
 
+const { string } = React.PropTypes;
+
 const InputField = React.createClass( {
+    propTypes: {
+        type: string.isRequired,
+    },
 
     mixins: [ Formsy.Mixin ],
 
@@ -22,5 +27,9 @@ const InputField = React.createClass( {
         );
     },
 } );
+
+InputField.propTypes = {
+    type: string.isRequired,
+};
 
 export default InputField;

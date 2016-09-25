@@ -11,10 +11,15 @@ const CartItem = ( { item, index, onRemoveItem } ) => (
     </div>
 );
 
+const { shape, string, number, func } = React.PropTypes;
 CartItem.propTypes = {
-    item: React.PropTypes.object,
-    index: React.PropTypes.number,
-    onRemoveItem: React.PropTypes.func,
+    item: shape( {
+        id: number.isRequired,
+        name: string.isRequired,
+        price: number.isRequired,
+    } ),
+    index: number.isRequired,
+    onRemoveItem: func.isRequired,
 };
 
 export default CartItem;

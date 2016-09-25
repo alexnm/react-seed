@@ -20,9 +20,10 @@ const LoginForm = ( { onSubmit, serverError } ) => (
     </div>
 );
 
+const { func, string } = React.PropTypes;
 LoginForm.propTypes = {
-    onSubmit: React.PropTypes.func,
-    serverError: React.PropTypes.string,
+    onSubmit: func.isRequired,
+    serverError: string.isRequired,
 };
 
 export default LoginForm;

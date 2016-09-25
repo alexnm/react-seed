@@ -7,11 +7,21 @@ import Dictionary from "../../dictionary";
 
 const loadProduct = Api.get( fetchProduct );
 
+const { bool, func, shape, number, string } = React.PropTypes;
+
 const ProductDetails = React.createClass( {
     propTypes: {
         params: React.PropTypes.object,
-        product: React.PropTypes.object.isRequired,
-        dispatch: React.PropTypes.func,
+        product: shape( {
+            id: number.isRequired,
+            name: string.isRequired,
+            price: number.isRequired,
+            description: string.isRequired,
+            imageUrl: string.isRequired,
+        } ),
+        isAuthenticated: bool.isRequired,
+        fetchProduct: func.isRequired,
+        onAddToCart: func.isRequired,
     },
 
     statics: {

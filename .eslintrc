@@ -37,6 +37,6 @@
         "react/jsx-filename-extension": 0,
         "react/jsx-curly-spacing": [ 2, "always" ],
         "react/jsx-indent": [ 2, 4 ],
-        "react/prop-types": 0
+        "react/prop-types": 2
     }
 }

@@ -7,10 +7,12 @@ import { ProductEntry } from "../components";
 
 const loadProducts = Api.get( fetchProducts );
 
+const { arrayOf, func, object } = React.PropTypes;
+
 const ProductList = React.createClass( {
     propTypes: {
-        products: React.PropTypes.array,
-        dispatch: React.PropTypes.func,
+        products: arrayOf( object ).isRequired,
+        dispatch: func.isRequired,
     },
 
     statics: {

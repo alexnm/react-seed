@@ -16,6 +16,12 @@ const Cart = ( { items, onRemoveFromCart } ) => (
     </div>
 );
 
+const { func, arrayOf, object } = React.PropTypes;
+Cart.propTypes = {
+    items: arrayOf( object ),
+    onRemoveFromCart: func.isRequired,
+};
+
 const mapStateToProps = ( state ) => ( {
     items: state.cart,
 } );

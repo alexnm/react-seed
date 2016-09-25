@@ -10,8 +10,14 @@ const ProductEntry = ( { product } ) => (
     </div>
 );
 
+const { shape, string, number } = React.PropTypes;
 ProductEntry.propTypes = {
-    product: React.PropTypes.object,
+    product: shape( {
+        id: number.isRequired,
+        imageUrl: string.isRequired,
+        name: string.isRequired,
+        price: string.price,
+    } ),
 };
 
 export default ProductEntry;

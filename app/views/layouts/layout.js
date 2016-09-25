@@ -28,10 +28,12 @@ const Layout = ( { showSpinner, isAuthenticated, children, onLogout } ) => {
     );
 };
 
+const { bool, func, object } = React.PropTypes;
 Layout.propTypes = {
-    showSpinner: React.PropTypes.bool,
-    isAuthenticated: React.PropTypes.bool,
-    children: React.PropTypes.object,
+    showSpinner: bool.isRequired,
+    isAuthenticated: bool.isRequired,
+    children: object,
+    onLogout: func.isRequired,
 };
 
 const mapStateToProps = ( state ) => ( {
