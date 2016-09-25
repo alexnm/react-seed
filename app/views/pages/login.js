@@ -1,11 +1,11 @@
 import React from "react";
-import { browserHistory } from "react-router";
 import { connect } from "react-redux";
 import Helmet from "react-helmet";
 import Dictionary from "../../dictionary";
 import { Api } from "../../utilities";
 import { login } from "../../ducks/session";
 import { LoginForm } from "../components/forms";
+import { Router } from "../helpers";
 
 const Login = React.createClass( {
     propTypes: {
@@ -17,7 +17,7 @@ const Login = React.createClass( {
 
     componentWillReceiveProps( nextProps ) {
         if ( !this.props.isAuthenticated && nextProps.isAuthenticated ) {
-            browserHistory.push( this.props.redirectAfterLogin || "/" );
+            Router.redirectTo( this.props.redirectAfterLogin || "/" );
         }
     },
 

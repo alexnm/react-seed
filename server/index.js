@@ -31,19 +31,28 @@ app.use( ( req, res ) => {
     }
 
     match( { routes, location: req.url }, ( error, redirect, props ) => {
+        if ( error ) {
+            res.status( 500 ).end( error.message );
+            return;
+        }
+
+        if ( redirect ) {
+            res.redirect( 302, redirect.pathname + redirect.search );
+            return;
+        }
+
         fetchDataForComponents( props, store ).then( ( ) => {
+            const head = Helmet.rewind( );
+            const initialState = store.getState( );
             const reactDom = renderToString(
                 <Provider store={ store }>
                     <RouterContext { ...props } />
                 </Provider>
             );
 
-            const head = Helmet.rewind( );
-            const initialState = store.getState( );
-
             res.set( "Content-Type", "text/html" )
-                .status( 200 )
-                .end( renderPage( reactDom, head, initialState ) );
+               .status( 200 )
+               .end( renderPage( reactDom, head, initialState ) );
         } );
     } );
 } );
