@@ -1,5 +1,1 @@
-import withAuthentication from "./withAuthentication";
-
-export {
-    withAuthentication,
-};
+export { default as withAuthentication } from "./withAuthentication";

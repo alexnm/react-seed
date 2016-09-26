@@ -1,9 +1,3 @@
-import CartItem from "./cartItem";
-import NotificationCenter from "./notificationCenter";
-import ProductEntry from "./productEntry";
-
-export {
-    CartItem,
-    NotificationCenter,
-    ProductEntry,
-};
+export { default as CartItem } from "./cartItem";
+export { default as NotificationCenter } from "./notificationCenter";
+export { default as ProductEntry } from "./productEntry";

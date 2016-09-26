@@ -1,7 +1,2 @@
-import createAsyncAction from "./createAsyncAction";
-import createReducer from "./createReducer";
-
-export {
-    createAsyncAction,
-    createReducer,
-};
+export { default as createAsyncAction } from "./createAsyncAction";
+export { default as createReducer } from "./createReducer";

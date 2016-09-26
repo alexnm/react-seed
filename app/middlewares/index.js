@@ -1,7 +1,2 @@
-import persistCart from "./persistCart";
-import storeAuthToken from "./storeAuthToken";
-
-export {
-    persistCart,
-    storeAuthToken,
-};
+export { default as persistCart } from "./persistCart";
+export { default as storeAuthToken } from "./storeAuthToken";

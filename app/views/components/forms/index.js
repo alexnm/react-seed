@@ -1,5 +1,1 @@
-import LoginForm from "./loginForm";
-
-export {
-    LoginForm,
-};
+export { default as LoginForm } from "./loginForm";

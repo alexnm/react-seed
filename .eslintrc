@@ -31,6 +31,9 @@
         
         // keep it simple
         "complexity": [ 1, 5 ],
+
+        // import
+        "import/prefer-default-export": 0,
         
         // react
         "react/prefer-es6-class": 0,
