@@ -13,11 +13,11 @@ const ProductDetails = React.createClass( {
     propTypes: {
         params: React.PropTypes.object,
         product: shape( {
-            id: number.isRequired,
-            name: string.isRequired,
-            price: number.isRequired,
-            description: string.isRequired,
-            imageUrl: string.isRequired,
+            id: number,
+            name: string,
+            price: number,
+            description: string,
+            imageUrl: string,
         } ),
         isAuthenticated: bool.isRequired,
         fetchProduct: func.isRequired,

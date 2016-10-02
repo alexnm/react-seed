@@ -1,5 +1,5 @@
-const defaultErrorMap = ( error ) => ( {
-    message: error.message,
+const defaultErrorMap = ( response ) => ( {
+    message: response.error,
 } );
 
 export default ( type, urlMapper, mapResponseToPayload, mapErrorToMessage = defaultErrorMap ) => ( {
@@ -12,8 +12,8 @@ export default ( type, urlMapper, mapResponseToPayload, mapErrorToMessage = defa
         type: `${ type }_COMPLETED`,
         payload: mapResponseToPayload( response ),
     } ),
-    failed: ( error ) => ( {
+    failed: ( response ) => ( {
         type: `${ type }_FAILED`,
-        payload: mapErrorToMessage( error ),
+        payload: mapErrorToMessage( response ),
     } ),
 } );

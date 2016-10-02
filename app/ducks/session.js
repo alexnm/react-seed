@@ -37,7 +37,7 @@ export const initializeSession = ( token ) => ( {
     },
 } );
 
-const initialState = { token: null };
+const initialState = { token: null, isAuthenticated: false };
 
 export default createReducer( initialState )( {
     [ LOGIN_COMPLETED ]: ( state, payload ) => Object.assign( { }, state, {

@@ -14,7 +14,7 @@ router.get( "/products/:id", ( req, res ) => {
 
 router.post( "/login", ( req, res ) => {
     setTimeout( ( ) => {
-        if ( req.body.username === "alex" && req.body.password === "secret" ) {
+        if ( req.body.username === "user" && req.body.password === "secret" ) {
             return res.json( { success: true, token: "1111-2222-3333-4444" } );
         }
 

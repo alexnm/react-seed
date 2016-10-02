@@ -5,7 +5,11 @@ import { NotificationCenter } from "../components";
 import { logout } from "../../ducks/session";
 
 const Layout = ( { showSpinner, isAuthenticated, children, onLogout } ) => {
-    const spinner = showSpinner ? ( <span>Loading...</span> ) : "";
+    const spinner = showSpinner ? (
+        <div className="overlay">
+            <span className="spinner" />
+        </div>
+    ) : "";
 
     const userLink = isAuthenticated ?
         ( <span className="navlink" onClick={ onLogout }>Logout</span> ) :

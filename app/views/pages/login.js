@@ -12,7 +12,7 @@ const { bool, string, func } = React.PropTypes;
 const Login = React.createClass( {
     propTypes: {
         isAuthenticated: bool.isRequired,
-        redirectAfterLogin: string.isRequired,
+        redirectAfterLogin: string,
         onSubmitLogin: func.isRequired,
         serverError: string.isRequired,
     },

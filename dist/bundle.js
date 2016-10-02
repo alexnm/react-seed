@@ -56,24 +56,35 @@
 
 	var _reactRouter = __webpack_require__(198);
 
-	var _routes = __webpack_require__(260);
+	var _utilities = __webpack_require__(260);
+
+	var _routes = __webpack_require__(274);
 
 	var _routes2 = _interopRequireDefault(_routes);
 
-	var _store = __webpack_require__(299);
+	var _store = __webpack_require__(317);
 
 	var _store2 = _interopRequireDefault(_store);
+
+	var _cart = __webpack_require__(292);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	var store = (0, _store2.default)(window.INITIAL_STATE);
+	var routes = (0, _routes2.default)(store.dispatch);
+
 	var rootHtml = _react2.default.createElement(
 	    _reactRedux.Provider,
 	    { store: store },
-	    _react2.default.createElement(_reactRouter.Router, { history: _reactRouter.browserHistory, routes: _routes2.default })
+	    _react2.default.createElement(_reactRouter.Router, { history: _reactRouter.browserHistory, routes: routes })
 	);
 
 	(0, _reactDom.render)(rootHtml, document.getElementById("react-root"));
+
+	var cart = _utilities.LocalStorage.loadCart();
+	if (cart) {
+	    store.dispatch((0, _cart.initializeCart)(cart));
+	}
 
 /***/ },
 /* 1 */
@@ -28378,36 +28389,46 @@
 	"use strict";
 
 	Object.defineProperty(exports, "__esModule", {
-	    value: true
+	  value: true
 	});
 
-	var _react = __webpack_require__(1);
+	var _api = __webpack_require__(261);
 
-	var _react2 = _interopRequireDefault(_react);
+	Object.defineProperty(exports, "Api", {
+	  enumerable: true,
+	  get: function get() {
+	    return _interopRequireDefault(_api).default;
+	  }
+	});
 
-	var _reactRouter = __webpack_require__(198);
+	var _cookies = __webpack_require__(271);
 
-	var _pages = __webpack_require__(261);
+	Object.defineProperty(exports, "Cookies", {
+	  enumerable: true,
+	  get: function get() {
+	    return _interopRequireDefault(_cookies).default;
+	  }
+	});
 
-	var _layout = __webpack_require__(296);
+	var _localStorage = __webpack_require__(273);
 
-	var _layout2 = _interopRequireDefault(_layout);
+	Object.defineProperty(exports, "LocalStorage", {
+	  enumerable: true,
+	  get: function get() {
+	    return _interopRequireDefault(_localStorage).default;
+	  }
+	});
 
-	var _enhancers = __webpack_require__(297);
+	var _notification = __webpack_require__(265);
+
+	Object.defineProperty(exports, "Notification", {
+	  enumerable: true,
+	  get: function get() {
+	    return _interopRequireDefault(_notification).default;
+	  }
+	});
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-	var routes = _react2.default.createElement(
-	    _reactRouter.Route,
-	    { path: "/", component: _layout2.default },
-	    _react2.default.createElement(_reactRouter.IndexRoute, { component: _pages.Home }),
-	    _react2.default.createElement(_reactRouter.Route, { path: "/login", component: _pages.Login }),
-	    _react2.default.createElement(_reactRouter.Route, { path: "/products", component: _pages.ProductList }),
-	    _react2.default.createElement(_reactRouter.Route, { path: "/products/:id", component: _pages.ProductDetails }),
-	    _react2.default.createElement(_reactRouter.Route, { path: "/my-cart", component: (0, _enhancers.withAuthentication)(_pages.Cart) })
-	);
-
-	exports.default = routes;
 
 /***/ },
 /* 261 */
@@ -28418,38 +28439,1112 @@
 	Object.defineProperty(exports, "__esModule", {
 	    value: true
 	});
-	exports.ProductList = exports.ProductDetails = exports.Login = exports.Home = exports.Cart = undefined;
 
-	var _cart = __webpack_require__(262);
+	var _fetch = __webpack_require__(262);
 
-	var _cart2 = _interopRequireDefault(_cart);
+	var _fetch2 = _interopRequireDefault(_fetch);
 
-	var _home = __webpack_require__(280);
+	var _notification = __webpack_require__(265);
 
-	var _home2 = _interopRequireDefault(_home);
+	var _notification2 = _interopRequireDefault(_notification);
 
-	var _login = __webpack_require__(282);
-
-	var _login2 = _interopRequireDefault(_login);
-
-	var _productDetails = __webpack_require__(291);
-
-	var _productDetails2 = _interopRequireDefault(_productDetails);
-
-	var _productList = __webpack_require__(293);
-
-	var _productList2 = _interopRequireDefault(_productList);
+	var _busy = __webpack_require__(270);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-	exports.Cart = _cart2.default;
-	exports.Home = _home2.default;
-	exports.Login = _login2.default;
-	exports.ProductDetails = _productDetails2.default;
-	exports.ProductList = _productList2.default;
+	var apiCall = function apiCall(method) {
+	    return function (action) {
+	        return function (params, body) {
+	            return function (dispatch) {
+	                var baseUrl = getBaseUrl();
+	                var url = "" + baseUrl + action.urlMapper(params);
+	                dispatch(action.started);
+	                dispatch(_busy.apiCallStarted);
+	                return (0, _fetch2.default)(url, method, body).then(function (res) {
+	                    return handleResponse(res, action, dispatch);
+	                }, function (err) {
+	                    return handleError(err, action, dispatch);
+	                });
+	            };
+	        };
+	    };
+	};
+
+	function getBaseUrl() {
+	    return typeof document === "undefined" ? "http://localhost:1234/api" : "/api";
+	}
+
+	function handleResponse(response, action, dispatch) {
+	    dispatch(_busy.apiCallEnded);
+	    dispatch(action.completed(response));
+	}
+
+	function handleError(_ref, action, dispatch) {
+	    var status = _ref.status;
+	    var response = _ref.response;
+
+	    dispatch(_busy.apiCallEnded);
+	    dispatch(action.failed(response));
+	    dispatch(_notification2.default.error(response.error));
+	}
+
+	exports.default = {
+	    get: apiCall("GET"),
+	    delete: apiCall("DELETE"),
+	    post: apiCall("POST"),
+	    put: apiCall("PUT")
+	};
 
 /***/ },
 /* 262 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+
+	var _isomorphicFetch = __webpack_require__(263);
+
+	var _isomorphicFetch2 = _interopRequireDefault(_isomorphicFetch);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	var SUCCESS = 200;
+	var REDIRECT = 300;
+
+	exports.default = function (url, method, body) {
+	    var options = {
+	        method: method,
+	        headers: requestHeaders(),
+	        body: method !== "GET" ? JSON.stringify(body) : null
+	    };
+
+	    return (0, _isomorphicFetch2.default)(url, options).then(function (res) {
+	        return parseStatus(res.status, res.json());
+	    });
+	};
+
+	function parseStatus(status, res) {
+	    return new Promise(function (resolve, reject) {
+	        if (status >= SUCCESS && status < REDIRECT) {
+	            res.then(function (response) {
+	                return resolve(response);
+	            });
+	        } else {
+	            res.then(function (response) {
+	                return reject({ status: status, response: response });
+	            });
+	        }
+	    });
+	}
+
+	function requestHeaders() {
+	    return {
+	        Accept: "application/json",
+	        "Content-Type": "application/json"
+	    };
+	}
+
+/***/ },
+/* 263 */
+/***/ function(module, exports, __webpack_require__) {
+
+	// the whatwg-fetch polyfill installs the fetch() function
+	// on the global object (window or self)
+	//
+	// Return that as the export for use in Webpack, Browserify etc.
+	__webpack_require__(264);
+	module.exports = self.fetch.bind(self);
+
+
+/***/ },
+/* 264 */
+/***/ function(module, exports) {
+
+	(function(self) {
+	  'use strict';
+
+	  if (self.fetch) {
+	    return
+	  }
+
+	  var support = {
+	    searchParams: 'URLSearchParams' in self,
+	    iterable: 'Symbol' in self && 'iterator' in Symbol,
+	    blob: 'FileReader' in self && 'Blob' in self && (function() {
+	      try {
+	        new Blob()
+	        return true
+	      } catch(e) {
+	        return false
+	      }
+	    })(),
+	    formData: 'FormData' in self,
+	    arrayBuffer: 'ArrayBuffer' in self
+	  }
+
+	  function normalizeName(name) {
+	    if (typeof name !== 'string') {
+	      name = String(name)
+	    }
+	    if (/[^a-z0-9\-#$%&'*+.\^_`|~]/i.test(name)) {
+	      throw new TypeError('Invalid character in header field name')
+	    }
+	    return name.toLowerCase()
+	  }
+
+	  function normalizeValue(value) {
+	    if (typeof value !== 'string') {
+	      value = String(value)
+	    }
+	    return value
+	  }
+
+	  // Build a destructive iterator for the value list
+	  function iteratorFor(items) {
+	    var iterator = {
+	      next: function() {
+	        var value = items.shift()
+	        return {done: value === undefined, value: value}
+	      }
+	    }
+
+	    if (support.iterable) {
+	      iterator[Symbol.iterator] = function() {
+	        return iterator
+	      }
+	    }
+
+	    return iterator
+	  }
+
+	  function Headers(headers) {
+	    this.map = {}
+
+	    if (headers instanceof Headers) {
+	      headers.forEach(function(value, name) {
+	        this.append(name, value)
+	      }, this)
+
+	    } else if (headers) {
+	      Object.getOwnPropertyNames(headers).forEach(function(name) {
+	        this.append(name, headers[name])
+	      }, this)
+	    }
+	  }
+
+	  Headers.prototype.append = function(name, value) {
+	    name = normalizeName(name)
+	    value = normalizeValue(value)
+	    var list = this.map[name]
+	    if (!list) {
+	      list = []
+	      this.map[name] = list
+	    }
+	    list.push(value)
+	  }
+
+	  Headers.prototype['delete'] = function(name) {
+	    delete this.map[normalizeName(name)]
+	  }
+
+	  Headers.prototype.get = function(name) {
+	    var values = this.map[normalizeName(name)]
+	    return values ? values[0] : null
+	  }
+
+	  Headers.prototype.getAll = function(name) {
+	    return this.map[normalizeName(name)] || []
+	  }
+
+	  Headers.prototype.has = function(name) {
+	    return this.map.hasOwnProperty(normalizeName(name))
+	  }
+
+	  Headers.prototype.set = function(name, value) {
+	    this.map[normalizeName(name)] = [normalizeValue(value)]
+	  }
+
+	  Headers.prototype.forEach = function(callback, thisArg) {
+	    Object.getOwnPropertyNames(this.map).forEach(function(name) {
+	      this.map[name].forEach(function(value) {
+	        callback.call(thisArg, value, name, this)
+	      }, this)
+	    }, this)
+	  }
+
+	  Headers.prototype.keys = function() {
+	    var items = []
+	    this.forEach(function(value, name) { items.push(name) })
+	    return iteratorFor(items)
+	  }
+
+	  Headers.prototype.values = function() {
+	    var items = []
+	    this.forEach(function(value) { items.push(value) })
+	    return iteratorFor(items)
+	  }
+
+	  Headers.prototype.entries = function() {
+	    var items = []
+	    this.forEach(function(value, name) { items.push([name, value]) })
+	    return iteratorFor(items)
+	  }
+
+	  if (support.iterable) {
+	    Headers.prototype[Symbol.iterator] = Headers.prototype.entries
+	  }
+
+	  function consumed(body) {
+	    if (body.bodyUsed) {
+	      return Promise.reject(new TypeError('Already read'))
+	    }
+	    body.bodyUsed = true
+	  }
+
+	  function fileReaderReady(reader) {
+	    return new Promise(function(resolve, reject) {
+	      reader.onload = function() {
+	        resolve(reader.result)
+	      }
+	      reader.onerror = function() {
+	        reject(reader.error)
+	      }
+	    })
+	  }
+
+	  function readBlobAsArrayBuffer(blob) {
+	    var reader = new FileReader()
+	    reader.readAsArrayBuffer(blob)
+	    return fileReaderReady(reader)
+	  }
+
+	  function readBlobAsText(blob) {
+	    var reader = new FileReader()
+	    reader.readAsText(blob)
+	    return fileReaderReady(reader)
+	  }
+
+	  function Body() {
+	    this.bodyUsed = false
+
+	    this._initBody = function(body) {
+	      this._bodyInit = body
+	      if (typeof body === 'string') {
+	        this._bodyText = body
+	      } else if (support.blob && Blob.prototype.isPrototypeOf(body)) {
+	        this._bodyBlob = body
+	      } else if (support.formData && FormData.prototype.isPrototypeOf(body)) {
+	        this._bodyFormData = body
+	      } else if (support.searchParams && URLSearchParams.prototype.isPrototypeOf(body)) {
+	        this._bodyText = body.toString()
+	      } else if (!body) {
+	        this._bodyText = ''
+	      } else if (support.arrayBuffer && ArrayBuffer.prototype.isPrototypeOf(body)) {
+	        // Only support ArrayBuffers for POST method.
+	        // Receiving ArrayBuffers happens via Blobs, instead.
+	      } else {
+	        throw new Error('unsupported BodyInit type')
+	      }
+
+	      if (!this.headers.get('content-type')) {
+	        if (typeof body === 'string') {
+	          this.headers.set('content-type', 'text/plain;charset=UTF-8')
+	        } else if (this._bodyBlob && this._bodyBlob.type) {
+	          this.headers.set('content-type', this._bodyBlob.type)
+	        } else if (support.searchParams && URLSearchParams.prototype.isPrototypeOf(body)) {
+	          this.headers.set('content-type', 'application/x-www-form-urlencoded;charset=UTF-8')
+	        }
+	      }
+	    }
+
+	    if (support.blob) {
+	      this.blob = function() {
+	        var rejected = consumed(this)
+	        if (rejected) {
+	          return rejected
+	        }
+
+	        if (this._bodyBlob) {
+	          return Promise.resolve(this._bodyBlob)
+	        } else if (this._bodyFormData) {
+	          throw new Error('could not read FormData body as blob')
+	        } else {
+	          return Promise.resolve(new Blob([this._bodyText]))
+	        }
+	      }
+
+	      this.arrayBuffer = function() {
+	        return this.blob().then(readBlobAsArrayBuffer)
+	      }
+
+	      this.text = function() {
+	        var rejected = consumed(this)
+	        if (rejected) {
+	          return rejected
+	        }
+
+	        if (this._bodyBlob) {
+	          return readBlobAsText(this._bodyBlob)
+	        } else if (this._bodyFormData) {
+	          throw new Error('could not read FormData body as text')
+	        } else {
+	          return Promise.resolve(this._bodyText)
+	        }
+	      }
+	    } else {
+	      this.text = function() {
+	        var rejected = consumed(this)
+	        return rejected ? rejected : Promise.resolve(this._bodyText)
+	      }
+	    }
+
+	    if (support.formData) {
+	      this.formData = function() {
+	        return this.text().then(decode)
+	      }
+	    }
+
+	    this.json = function() {
+	      return this.text().then(JSON.parse)
+	    }
+
+	    return this
+	  }
+
+	  // HTTP methods whose capitalization should be normalized
+	  var methods = ['DELETE', 'GET', 'HEAD', 'OPTIONS', 'POST', 'PUT']
+
+	  function normalizeMethod(method) {
+	    var upcased = method.toUpperCase()
+	    return (methods.indexOf(upcased) > -1) ? upcased : method
+	  }
+
+	  function Request(input, options) {
+	    options = options || {}
+	    var body = options.body
+	    if (Request.prototype.isPrototypeOf(input)) {
+	      if (input.bodyUsed) {
+	        throw new TypeError('Already read')
+	      }
+	      this.url = input.url
+	      this.credentials = input.credentials
+	      if (!options.headers) {
+	        this.headers = new Headers(input.headers)
+	      }
+	      this.method = input.method
+	      this.mode = input.mode
+	      if (!body) {
+	        body = input._bodyInit
+	        input.bodyUsed = true
+	      }
+	    } else {
+	      this.url = input
+	    }
+
+	    this.credentials = options.credentials || this.credentials || 'omit'
+	    if (options.headers || !this.headers) {
+	      this.headers = new Headers(options.headers)
+	    }
+	    this.method = normalizeMethod(options.method || this.method || 'GET')
+	    this.mode = options.mode || this.mode || null
+	    this.referrer = null
+
+	    if ((this.method === 'GET' || this.method === 'HEAD') && body) {
+	      throw new TypeError('Body not allowed for GET or HEAD requests')
+	    }
+	    this._initBody(body)
+	  }
+
+	  Request.prototype.clone = function() {
+	    return new Request(this)
+	  }
+
+	  function decode(body) {
+	    var form = new FormData()
+	    body.trim().split('&').forEach(function(bytes) {
+	      if (bytes) {
+	        var split = bytes.split('=')
+	        var name = split.shift().replace(/\+/g, ' ')
+	        var value = split.join('=').replace(/\+/g, ' ')
+	        form.append(decodeURIComponent(name), decodeURIComponent(value))
+	      }
+	    })
+	    return form
+	  }
+
+	  function headers(xhr) {
+	    var head = new Headers()
+	    var pairs = (xhr.getAllResponseHeaders() || '').trim().split('\n')
+	    pairs.forEach(function(header) {
+	      var split = header.trim().split(':')
+	      var key = split.shift().trim()
+	      var value = split.join(':').trim()
+	      head.append(key, value)
+	    })
+	    return head
+	  }
+
+	  Body.call(Request.prototype)
+
+	  function Response(bodyInit, options) {
+	    if (!options) {
+	      options = {}
+	    }
+
+	    this.type = 'default'
+	    this.status = options.status
+	    this.ok = this.status >= 200 && this.status < 300
+	    this.statusText = options.statusText
+	    this.headers = options.headers instanceof Headers ? options.headers : new Headers(options.headers)
+	    this.url = options.url || ''
+	    this._initBody(bodyInit)
+	  }
+
+	  Body.call(Response.prototype)
+
+	  Response.prototype.clone = function() {
+	    return new Response(this._bodyInit, {
+	      status: this.status,
+	      statusText: this.statusText,
+	      headers: new Headers(this.headers),
+	      url: this.url
+	    })
+	  }
+
+	  Response.error = function() {
+	    var response = new Response(null, {status: 0, statusText: ''})
+	    response.type = 'error'
+	    return response
+	  }
+
+	  var redirectStatuses = [301, 302, 303, 307, 308]
+
+	  Response.redirect = function(url, status) {
+	    if (redirectStatuses.indexOf(status) === -1) {
+	      throw new RangeError('Invalid status code')
+	    }
+
+	    return new Response(null, {status: status, headers: {location: url}})
+	  }
+
+	  self.Headers = Headers
+	  self.Request = Request
+	  self.Response = Response
+
+	  self.fetch = function(input, init) {
+	    return new Promise(function(resolve, reject) {
+	      var request
+	      if (Request.prototype.isPrototypeOf(input) && !init) {
+	        request = input
+	      } else {
+	        request = new Request(input, init)
+	      }
+
+	      var xhr = new XMLHttpRequest()
+
+	      function responseURL() {
+	        if ('responseURL' in xhr) {
+	          return xhr.responseURL
+	        }
+
+	        // Avoid security warnings on getResponseHeader when not allowed by CORS
+	        if (/^X-Request-URL:/m.test(xhr.getAllResponseHeaders())) {
+	          return xhr.getResponseHeader('X-Request-URL')
+	        }
+
+	        return
+	      }
+
+	      xhr.onload = function() {
+	        var options = {
+	          status: xhr.status,
+	          statusText: xhr.statusText,
+	          headers: headers(xhr),
+	          url: responseURL()
+	        }
+	        var body = 'response' in xhr ? xhr.response : xhr.responseText
+	        resolve(new Response(body, options))
+	      }
+
+	      xhr.onerror = function() {
+	        reject(new TypeError('Network request failed'))
+	      }
+
+	      xhr.ontimeout = function() {
+	        reject(new TypeError('Network request failed'))
+	      }
+
+	      xhr.open(request.method, request.url, true)
+
+	      if (request.credentials === 'include') {
+	        xhr.withCredentials = true
+	      }
+
+	      if ('responseType' in xhr && support.blob) {
+	        xhr.responseType = 'blob'
+	      }
+
+	      request.headers.forEach(function(value, name) {
+	        xhr.setRequestHeader(name, value)
+	      })
+
+	      xhr.send(typeof request._bodyInit === 'undefined' ? null : request._bodyInit)
+	    })
+	  }
+	  self.fetch.polyfill = true
+	})(typeof self !== 'undefined' ? self : this);
+
+
+/***/ },
+/* 265 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	exports.notification = undefined;
+
+	var _notifications = __webpack_require__(266);
+
+	var notification = exports.notification = function notification(type) {
+	    return function (text) {
+	        var timeout = arguments.length <= 1 || arguments[1] === undefined ? 3000 : arguments[1];
+	        return function (dispatch) {
+	            var notificationObj = (0, _notifications.pushNotification)(type, text);
+	            dispatch(notificationObj);
+	            setTimeout(function () {
+	                return dispatch((0, _notifications.dismissNotification)(notificationObj.id));
+	            }, timeout);
+	        };
+	    };
+	};
+
+	exports.default = {
+	    info: notification("info"),
+	    warning: notification("warning"),
+	    error: notification("error")
+	};
+
+/***/ },
+/* 266 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	exports.dismissNotification = exports.pushNotification = undefined;
+
+	var _createReducer;
+
+	var _utilities = __webpack_require__(267);
+
+	function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+	function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
+
+	var DISMISS_NOTIFICATION = "DISMISS_NOTIFICATION";
+	var PUSH_NOTIFICATION = "PUSH_NOTIFICATION";
+
+	var pushNotification = exports.pushNotification = function pushNotification(type, text) {
+	    return {
+	        type: PUSH_NOTIFICATION,
+	        payload: {
+	            type: type,
+	            text: text
+	        }
+	    };
+	};
+
+	var dismissNotification = exports.dismissNotification = function dismissNotification(id) {
+	    return {
+	        type: DISMISS_NOTIFICATION,
+	        payload: {
+	            id: id
+	        }
+	    };
+	};
+
+	var initialState = [];
+
+	exports.default = (0, _utilities.createReducer)(initialState)((_createReducer = {}, _defineProperty(_createReducer, PUSH_NOTIFICATION, function (state, payload) {
+	    return [].concat(_toConsumableArray(state), [payload]);
+	}), _defineProperty(_createReducer, DISMISS_NOTIFICATION, function (state, payload) {
+	    var index = state.map(function (n) {
+	        return n.id;
+	    }).indexOf(payload.id);
+	    return [].concat(_toConsumableArray(state.slice(0, index)), _toConsumableArray(state.slice(index + 1)));
+	}), _createReducer));
+
+/***/ },
+/* 267 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+
+	var _createAsyncAction = __webpack_require__(268);
+
+	Object.defineProperty(exports, "createAsyncAction", {
+	  enumerable: true,
+	  get: function get() {
+	    return _interopRequireDefault(_createAsyncAction).default;
+	  }
+	});
+
+	var _createReducer = __webpack_require__(269);
+
+	Object.defineProperty(exports, "createReducer", {
+	  enumerable: true,
+	  get: function get() {
+	    return _interopRequireDefault(_createReducer).default;
+	  }
+	});
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+/***/ },
+/* 268 */
+/***/ function(module, exports) {
+
+	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	var defaultErrorMap = function defaultErrorMap(response) {
+	    return {
+	        message: response.error
+	    };
+	};
+
+	exports.default = function (type, urlMapper, mapResponseToPayload) {
+	    var mapErrorToMessage = arguments.length <= 3 || arguments[3] === undefined ? defaultErrorMap : arguments[3];
+	    return {
+	        name: type,
+	        urlMapper: urlMapper,
+	        started: {
+	            type: type
+	        },
+	        completed: function completed(response) {
+	            return {
+	                type: type + "_COMPLETED",
+	                payload: mapResponseToPayload(response)
+	            };
+	        },
+	        failed: function failed(response) {
+	            return {
+	                type: type + "_FAILED",
+	                payload: mapErrorToMessage(response)
+	            };
+	        }
+	    };
+	};
+
+/***/ },
+/* 269 */
+/***/ function(module, exports) {
+
+	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+
+	exports.default = function (initialState) {
+	    return function (reducerMap) {
+	        return function () {
+	            var state = arguments.length <= 0 || arguments[0] === undefined ? initialState : arguments[0];
+	            var action = arguments[1];
+
+	            var reducer = reducerMap[action.type];
+	            return reducer ? reducer(state, action.payload) : state;
+	        };
+	    };
+	};
+
+/***/ },
+/* 270 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	exports.apiCallEnded = exports.apiCallStarted = undefined;
+
+	var _createReducer;
+
+	var _utilities = __webpack_require__(267);
+
+	function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+	var API_CALL_STARTED = "API_CALL_STARTED";
+	var API_CALL_ENDED = "API_CALL_ENDED";
+
+	var apiCallStarted = exports.apiCallStarted = { type: API_CALL_STARTED };
+	var apiCallEnded = exports.apiCallEnded = { type: API_CALL_ENDED };
+
+	var initialState = 0;
+
+	exports.default = (0, _utilities.createReducer)(initialState)((_createReducer = {}, _defineProperty(_createReducer, API_CALL_STARTED, function (state) {
+	    return state + 1;
+	}), _defineProperty(_createReducer, API_CALL_ENDED, function (state) {
+	    return state - 1;
+	}), _createReducer));
+
+/***/ },
+/* 271 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+
+	var _jsCookie = __webpack_require__(272);
+
+	var _jsCookie2 = _interopRequireDefault(_jsCookie);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	var set = function set(name, value) {
+	    return _jsCookie2.default.set(name, value);
+	};
+	var get = function get(name) {
+	    return _jsCookie2.default.get(name);
+	};
+	var remove = function remove(name) {
+	    return _jsCookie2.default.remove(name);
+	};
+
+	exports.default = {
+	    set: set,
+	    get: get,
+	    remove: remove
+	};
+
+/***/ },
+/* 272 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_RESULT__;/*!
+	 * JavaScript Cookie v2.1.3
+	 * https://github.com/js-cookie/js-cookie
+	 *
+	 * Copyright 2006, 2015 Klaus Hartl & Fagner Brack
+	 * Released under the MIT license
+	 */
+	;(function (factory) {
+		var registeredInModuleLoader = false;
+		if (true) {
+			!(__WEBPACK_AMD_DEFINE_FACTORY__ = (factory), __WEBPACK_AMD_DEFINE_RESULT__ = (typeof __WEBPACK_AMD_DEFINE_FACTORY__ === 'function' ? (__WEBPACK_AMD_DEFINE_FACTORY__.call(exports, __webpack_require__, exports, module)) : __WEBPACK_AMD_DEFINE_FACTORY__), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
+			registeredInModuleLoader = true;
+		}
+		if (true) {
+			module.exports = factory();
+			registeredInModuleLoader = true;
+		}
+		if (!registeredInModuleLoader) {
+			var OldCookies = window.Cookies;
+			var api = window.Cookies = factory();
+			api.noConflict = function () {
+				window.Cookies = OldCookies;
+				return api;
+			};
+		}
+	}(function () {
+		function extend () {
+			var i = 0;
+			var result = {};
+			for (; i < arguments.length; i++) {
+				var attributes = arguments[ i ];
+				for (var key in attributes) {
+					result[key] = attributes[key];
+				}
+			}
+			return result;
+		}
+
+		function init (converter) {
+			function api (key, value, attributes) {
+				var result;
+				if (typeof document === 'undefined') {
+					return;
+				}
+
+				// Write
+
+				if (arguments.length > 1) {
+					attributes = extend({
+						path: '/'
+					}, api.defaults, attributes);
+
+					if (typeof attributes.expires === 'number') {
+						var expires = new Date();
+						expires.setMilliseconds(expires.getMilliseconds() + attributes.expires * 864e+5);
+						attributes.expires = expires;
+					}
+
+					try {
+						result = JSON.stringify(value);
+						if (/^[\{\[]/.test(result)) {
+							value = result;
+						}
+					} catch (e) {}
+
+					if (!converter.write) {
+						value = encodeURIComponent(String(value))
+							.replace(/%(23|24|26|2B|3A|3C|3E|3D|2F|3F|40|5B|5D|5E|60|7B|7D|7C)/g, decodeURIComponent);
+					} else {
+						value = converter.write(value, key);
+					}
+
+					key = encodeURIComponent(String(key));
+					key = key.replace(/%(23|24|26|2B|5E|60|7C)/g, decodeURIComponent);
+					key = key.replace(/[\(\)]/g, escape);
+
+					return (document.cookie = [
+						key, '=', value,
+						attributes.expires ? '; expires=' + attributes.expires.toUTCString() : '', // use expires attribute, max-age is not supported by IE
+						attributes.path ? '; path=' + attributes.path : '',
+						attributes.domain ? '; domain=' + attributes.domain : '',
+						attributes.secure ? '; secure' : ''
+					].join(''));
+				}
+
+				// Read
+
+				if (!key) {
+					result = {};
+				}
+
+				// To prevent the for loop in the first place assign an empty array
+				// in case there are no cookies at all. Also prevents odd result when
+				// calling "get()"
+				var cookies = document.cookie ? document.cookie.split('; ') : [];
+				var rdecode = /(%[0-9A-Z]{2})+/g;
+				var i = 0;
+
+				for (; i < cookies.length; i++) {
+					var parts = cookies[i].split('=');
+					var cookie = parts.slice(1).join('=');
+
+					if (cookie.charAt(0) === '"') {
+						cookie = cookie.slice(1, -1);
+					}
+
+					try {
+						var name = parts[0].replace(rdecode, decodeURIComponent);
+						cookie = converter.read ?
+							converter.read(cookie, name) : converter(cookie, name) ||
+							cookie.replace(rdecode, decodeURIComponent);
+
+						if (this.json) {
+							try {
+								cookie = JSON.parse(cookie);
+							} catch (e) {}
+						}
+
+						if (key === name) {
+							result = cookie;
+							break;
+						}
+
+						if (!key) {
+							result[name] = cookie;
+						}
+					} catch (e) {}
+				}
+
+				return result;
+			}
+
+			api.set = api;
+			api.get = function (key) {
+				return api.call(api, key);
+			};
+			api.getJSON = function () {
+				return api.apply({
+					json: true
+				}, [].slice.call(arguments));
+			};
+			api.defaults = {};
+
+			api.remove = function (key, attributes) {
+				api(key, '', extend(attributes, {
+					expires: -1
+				}));
+			};
+
+			api.withConverter = init;
+
+			return api;
+		}
+
+		return init(function () {});
+	}));
+
+
+/***/ },
+/* 273 */
+/***/ function(module, exports) {
+
+	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	var loadCart = function loadCart() {
+	    var serializedCart = localStorage.getItem("cart");
+	    if (!serializedCart) {
+	        return null;
+	    }
+
+	    return JSON.parse(serializedCart);
+	};
+
+	var saveCart = function saveCart(cart) {
+	    var serializedCart = JSON.stringify(cart);
+	    localStorage.setItem("cart", serializedCart);
+	};
+
+	exports.default = {
+	    loadCart: loadCart,
+	    saveCart: saveCart
+	};
+
+/***/ },
+/* 274 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	exports.default = createRoutes;
+
+	var _react = __webpack_require__(1);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	var _reactRouter = __webpack_require__(198);
+
+	var _pages = __webpack_require__(275);
+
+	var _layout = __webpack_require__(314);
+
+	var _layout2 = _interopRequireDefault(_layout);
+
+	var _enhancers = __webpack_require__(315);
+
+	var _session = __webpack_require__(295);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	function createRoutes(dispatch) {
+	    var setRedirectUrl = function setRedirectUrl(prevState, nextState) {
+	        var oldUrl = prevState.location.pathname;
+	        var newUrl = nextState.location.pathname;
+
+	        if (nextState.location.action === "PUSH" && newUrl === "/login") {
+	            dispatch((0, _session.setRedirectAfterLogin)(oldUrl));
+	        }
+	    };
+
+	    return _react2.default.createElement(
+	        _reactRouter.Route,
+	        { path: "/", component: _layout2.default, onChange: setRedirectUrl },
+	        _react2.default.createElement(_reactRouter.IndexRoute, { component: _pages.Home }),
+	        _react2.default.createElement(_reactRouter.Redirect, { from: "/old-url", to: "/products" }),
+	        _react2.default.createElement(_reactRouter.Route, { path: "/login", component: _pages.Login }),
+	        _react2.default.createElement(_reactRouter.Route, { path: "/products", component: _pages.ProductList }),
+	        _react2.default.createElement(_reactRouter.Route, { path: "/products/:id", component: _pages.ProductDetails }),
+	        _react2.default.createElement(_reactRouter.Route, { path: "/my-cart", component: (0, _enhancers.withAuthentication)(_pages.Cart) }),
+	        _react2.default.createElement(_reactRouter.Route, { path: "/*", component: _pages.NotFound })
+	    );
+	}
+
+/***/ },
+/* 275 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+
+	var _cart = __webpack_require__(276);
+
+	Object.defineProperty(exports, "Cart", {
+	  enumerable: true,
+	  get: function get() {
+	    return _interopRequireDefault(_cart).default;
+	  }
+	});
+
+	var _home = __webpack_require__(293);
+
+	Object.defineProperty(exports, "Home", {
+	  enumerable: true,
+	  get: function get() {
+	    return _interopRequireDefault(_home).default;
+	  }
+	});
+
+	var _login = __webpack_require__(294);
+
+	Object.defineProperty(exports, "Login", {
+	  enumerable: true,
+	  get: function get() {
+	    return _interopRequireDefault(_login).default;
+	  }
+	});
+
+	var _notFound = __webpack_require__(309);
+
+	Object.defineProperty(exports, "NotFound", {
+	  enumerable: true,
+	  get: function get() {
+	    return _interopRequireDefault(_notFound).default;
+	  }
+	});
+
+	var _productDetails = __webpack_require__(310);
+
+	Object.defineProperty(exports, "ProductDetails", {
+	  enumerable: true,
+	  get: function get() {
+	    return _interopRequireDefault(_productDetails).default;
+	  }
+	});
+
+	var _productList = __webpack_require__(312);
+
+	Object.defineProperty(exports, "ProductList", {
+	  enumerable: true,
+	  get: function get() {
+	    return _interopRequireDefault(_productList).default;
+	  }
+	});
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+/***/ },
+/* 276 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -28464,37 +29559,66 @@
 
 	var _reactRedux = __webpack_require__(172);
 
-	var _reactHelmet = __webpack_require__(263);
+	var _reactHelmet = __webpack_require__(277);
 
 	var _reactHelmet2 = _interopRequireDefault(_reactHelmet);
 
-	var _helpers = __webpack_require__(273);
+	var _dictionary = __webpack_require__(287);
+
+	var _dictionary2 = _interopRequireDefault(_dictionary);
+
+	var _components = __webpack_require__(288);
+
+	var _cart = __webpack_require__(292);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-	var Cart = _react2.default.createClass({
-	    displayName: "Cart",
-
-	    propTypes: {},
-
-	    render: function render() {
-	        return _react2.default.createElement(
-	            "div",
+	var Cart = function Cart(_ref) {
+	    var items = _ref.items;
+	    var onRemoveFromCart = _ref.onRemoveFromCart;
+	    return _react2.default.createElement(
+	        "div",
+	        null,
+	        _react2.default.createElement(_reactHelmet2.default, { title: _dictionary2.default.cart.myCart }),
+	        _react2.default.createElement(
+	            "h1",
 	            null,
-	            _react2.default.createElement(_reactHelmet2.default, { title: "My shopping cart" }),
-	            _react2.default.createElement(
-	                "h1",
-	                null,
-	                "My shopping cart"
-	            )
-	        );
-	    }
-	});
+	            _dictionary2.default.cart.myCart
+	        ),
+	        items.map(function (item, index) {
+	            return _react2.default.createElement(_components.CartItem, { item: item, key: index, index: index, onRemoveItem: onRemoveFromCart });
+	        })
+	    );
+	};
 
-	exports.default = (0, _reactRedux.connect)(null)(Cart);
+	var _React$PropTypes = _react2.default.PropTypes;
+	var func = _React$PropTypes.func;
+	var arrayOf = _React$PropTypes.arrayOf;
+	var object = _React$PropTypes.object;
+
+	Cart.propTypes = {
+	    items: arrayOf(object),
+	    onRemoveFromCart: func.isRequired
+	};
+
+	var mapStateToProps = function mapStateToProps(state) {
+	    return {
+	        items: state.cart
+	    };
+	};
+
+	var mapDispatchToProps = function mapDispatchToProps(dispatch) {
+	    return {
+	        onRemoveFromCart: function onRemoveFromCart(index) {
+	            return dispatch((0, _cart.removeFromCart)(index));
+	        }
+	    };
+	};
+
+	exports.default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)(Cart);
 
 /***/ },
-/* 263 */
+/* 277 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, "__esModule", {
@@ -28519,21 +29643,21 @@
 
 	var _react2 = _interopRequireDefault(_react);
 
-	var _reactSideEffect = __webpack_require__(264);
+	var _reactSideEffect = __webpack_require__(278);
 
 	var _reactSideEffect2 = _interopRequireDefault(_reactSideEffect);
 
-	var _deepEqual = __webpack_require__(267);
+	var _deepEqual = __webpack_require__(281);
 
 	var _deepEqual2 = _interopRequireDefault(_deepEqual);
 
-	var _objectAssign = __webpack_require__(270);
+	var _objectAssign = __webpack_require__(284);
 
 	var _objectAssign2 = _interopRequireDefault(_objectAssign);
 
-	var _HelmetConstantsJs = __webpack_require__(271);
+	var _HelmetConstantsJs = __webpack_require__(285);
 
-	var _PlainComponent = __webpack_require__(272);
+	var _PlainComponent = __webpack_require__(286);
 
 	var _PlainComponent2 = _interopRequireDefault(_PlainComponent);
 
@@ -29046,7 +30170,7 @@
 	module.exports = exports["default"];
 
 /***/ },
-/* 264 */
+/* 278 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -29063,11 +30187,11 @@
 
 	var _react2 = _interopRequireDefault(_react);
 
-	var _fbjsLibExecutionEnvironment = __webpack_require__(265);
+	var _fbjsLibExecutionEnvironment = __webpack_require__(279);
 
 	var _fbjsLibExecutionEnvironment2 = _interopRequireDefault(_fbjsLibExecutionEnvironment);
 
-	var _fbjsLibShallowEqual = __webpack_require__(266);
+	var _fbjsLibShallowEqual = __webpack_require__(280);
 
 	var _fbjsLibShallowEqual2 = _interopRequireDefault(_fbjsLibShallowEqual);
 
@@ -29175,7 +30299,7 @@
 	};
 
 /***/ },
-/* 265 */
+/* 279 */
 /***/ function(module, exports) {
 
 	/**
@@ -29216,7 +30340,7 @@
 	module.exports = ExecutionEnvironment;
 
 /***/ },
-/* 266 */
+/* 280 */
 /***/ function(module, exports) {
 
 	/**
@@ -29271,12 +30395,12 @@
 	module.exports = shallowEqual;
 
 /***/ },
-/* 267 */
+/* 281 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var pSlice = Array.prototype.slice;
-	var objectKeys = __webpack_require__(268);
-	var isArguments = __webpack_require__(269);
+	var objectKeys = __webpack_require__(282);
+	var isArguments = __webpack_require__(283);
 
 	var deepEqual = module.exports = function (actual, expected, opts) {
 	  if (!opts) opts = {};
@@ -29371,7 +30495,7 @@
 
 
 /***/ },
-/* 268 */
+/* 282 */
 /***/ function(module, exports) {
 
 	exports = module.exports = typeof Object.keys === 'function'
@@ -29386,7 +30510,7 @@
 
 
 /***/ },
-/* 269 */
+/* 283 */
 /***/ function(module, exports) {
 
 	var supportsArgumentsClass = (function(){
@@ -29412,7 +30536,7 @@
 
 
 /***/ },
-/* 270 */
+/* 284 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -29501,7 +30625,7 @@
 
 
 /***/ },
-/* 271 */
+/* 285 */
 /***/ function(module, exports) {
 
 	Object.defineProperty(exports, "__esModule", {
@@ -29538,7 +30662,7 @@
 	exports.REACT_TAG_MAP = REACT_TAG_MAP;
 
 /***/ },
-/* 272 */
+/* 286 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, "__esModule", {
@@ -29582,651 +30706,76 @@
 	module.exports = exports["default"];
 
 /***/ },
-/* 273 */
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
-
-	Object.defineProperty(exports, "__esModule", {
-	    value: true
-	});
-	exports.fetch = exports.Api = undefined;
-
-	var _api = __webpack_require__(274);
-
-	var _api2 = _interopRequireDefault(_api);
-
-	var _fetch = __webpack_require__(275);
-
-	var _fetch2 = _interopRequireDefault(_fetch);
-
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-	exports.Api = _api2.default;
-	exports.fetch = _fetch2.default;
-
-/***/ },
-/* 274 */
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
-
-	Object.defineProperty(exports, "__esModule", {
-	    value: true
-	});
-
-	var _fetch = __webpack_require__(275);
-
-	var _fetch2 = _interopRequireDefault(_fetch);
-
-	var _apiActions = __webpack_require__(278);
-
-	var _actionIdentifiers = __webpack_require__(279);
-
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-	var apiCall = function apiCall(method) {
-	    return function (action) {
-	        return function (params, body) {
-	            return function (dispatch) {
-	                var url = urlMapper(action, params);
-	                dispatch(action.started);
-	                dispatch(_apiActions.apiCallStarted);
-	                return (0, _fetch2.default)(url, method, body).then(function (res) {
-	                    return handleResponse(res, action, dispatch);
-	                }, function (err) {
-	                    return handleError(err, action, dispatch);
-	                });
-	            };
-	        };
-	    };
-	};
-
-	function urlMapper(action, params) {
-	    var baseUrl = getBaseUrl();
-	    switch (action.name) {
-	        case _actionIdentifiers.GET_PRODUCTS:
-	            return baseUrl + "/products";
-	        case _actionIdentifiers.GET_PRODUCT:
-	            return baseUrl + "/products/" + params.id;
-	        case _actionIdentifiers.LOGIN:
-	            return baseUrl + "/login";
-	        default:
-	            throw new Error("action does not have a url defined in api.js");
-	    }
-	}
-
-	function getBaseUrl() {
-	    return typeof document === "undefined" ? "http://localhost:1234/api" : "/api";
-	}
-
-	function handleResponse(response, action, dispatch) {
-	    dispatch(_apiActions.apiCallEnded);
-	    dispatch(action.completed(response));
-	}
-
-	function handleError(response, action, dispatch) {
-	    dispatch(_apiActions.apiCallEnded);
-	    dispatch(action.failed(response));
-	}
-
-	exports.default = {
-	    get: apiCall("GET"),
-	    delete: apiCall("DELETE"),
-	    post: apiCall("POST"),
-	    put: apiCall("PUT")
-	};
-
-/***/ },
-/* 275 */
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
-
-	Object.defineProperty(exports, "__esModule", {
-	    value: true
-	});
-
-	var _isomorphicFetch = __webpack_require__(276);
-
-	var _isomorphicFetch2 = _interopRequireDefault(_isomorphicFetch);
-
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-	var SUCCESS = 200;
-	var REDIRECT = 300;
-
-	exports.default = function (url, method, body) {
-	    var options = {
-	        method: method,
-	        headers: requestHeaders(),
-	        body: method !== "GET" ? JSON.stringify(body) : null
-	    };
-
-	    return (0, _isomorphicFetch2.default)(url, options).then(function (res) {
-	        return parseStatus(res.status, res.json());
-	    });
-	};
-
-	function parseStatus(status, res) {
-	    return new Promise(function (resolve, reject) {
-	        if (status >= SUCCESS && status < REDIRECT) {
-	            res.then(function (response) {
-	                return resolve(response);
-	            });
-	        } else {
-	            res.then(function (response) {
-	                return reject({ status: status, response: response });
-	            });
-	        }
-	    });
-	}
-
-	function requestHeaders() {
-	    return {
-	        Accept: "application/json",
-	        "Content-Type": "application/json"
-	    };
-	}
-
-/***/ },
-/* 276 */
-/***/ function(module, exports, __webpack_require__) {
-
-	// the whatwg-fetch polyfill installs the fetch() function
-	// on the global object (window or self)
-	//
-	// Return that as the export for use in Webpack, Browserify etc.
-	__webpack_require__(277);
-	module.exports = self.fetch.bind(self);
-
-
-/***/ },
-/* 277 */
+/* 287 */
 /***/ function(module, exports) {
 
-	(function(self) {
-	  'use strict';
-
-	  if (self.fetch) {
-	    return
-	  }
-
-	  var support = {
-	    searchParams: 'URLSearchParams' in self,
-	    iterable: 'Symbol' in self && 'iterator' in Symbol,
-	    blob: 'FileReader' in self && 'Blob' in self && (function() {
-	      try {
-	        new Blob()
-	        return true
-	      } catch(e) {
-	        return false
-	      }
-	    })(),
-	    formData: 'FormData' in self,
-	    arrayBuffer: 'ArrayBuffer' in self
-	  }
-
-	  function normalizeName(name) {
-	    if (typeof name !== 'string') {
-	      name = String(name)
-	    }
-	    if (/[^a-z0-9\-#$%&'*+.\^_`|~]/i.test(name)) {
-	      throw new TypeError('Invalid character in header field name')
-	    }
-	    return name.toLowerCase()
-	  }
-
-	  function normalizeValue(value) {
-	    if (typeof value !== 'string') {
-	      value = String(value)
-	    }
-	    return value
-	  }
-
-	  // Build a destructive iterator for the value list
-	  function iteratorFor(items) {
-	    var iterator = {
-	      next: function() {
-	        var value = items.shift()
-	        return {done: value === undefined, value: value}
-	      }
-	    }
-
-	    if (support.iterable) {
-	      iterator[Symbol.iterator] = function() {
-	        return iterator
-	      }
-	    }
-
-	    return iterator
-	  }
-
-	  function Headers(headers) {
-	    this.map = {}
-
-	    if (headers instanceof Headers) {
-	      headers.forEach(function(value, name) {
-	        this.append(name, value)
-	      }, this)
-
-	    } else if (headers) {
-	      Object.getOwnPropertyNames(headers).forEach(function(name) {
-	        this.append(name, headers[name])
-	      }, this)
-	    }
-	  }
-
-	  Headers.prototype.append = function(name, value) {
-	    name = normalizeName(name)
-	    value = normalizeValue(value)
-	    var list = this.map[name]
-	    if (!list) {
-	      list = []
-	      this.map[name] = list
-	    }
-	    list.push(value)
-	  }
-
-	  Headers.prototype['delete'] = function(name) {
-	    delete this.map[normalizeName(name)]
-	  }
-
-	  Headers.prototype.get = function(name) {
-	    var values = this.map[normalizeName(name)]
-	    return values ? values[0] : null
-	  }
-
-	  Headers.prototype.getAll = function(name) {
-	    return this.map[normalizeName(name)] || []
-	  }
-
-	  Headers.prototype.has = function(name) {
-	    return this.map.hasOwnProperty(normalizeName(name))
-	  }
-
-	  Headers.prototype.set = function(name, value) {
-	    this.map[normalizeName(name)] = [normalizeValue(value)]
-	  }
-
-	  Headers.prototype.forEach = function(callback, thisArg) {
-	    Object.getOwnPropertyNames(this.map).forEach(function(name) {
-	      this.map[name].forEach(function(value) {
-	        callback.call(thisArg, value, name, this)
-	      }, this)
-	    }, this)
-	  }
-
-	  Headers.prototype.keys = function() {
-	    var items = []
-	    this.forEach(function(value, name) { items.push(name) })
-	    return iteratorFor(items)
-	  }
-
-	  Headers.prototype.values = function() {
-	    var items = []
-	    this.forEach(function(value) { items.push(value) })
-	    return iteratorFor(items)
-	  }
-
-	  Headers.prototype.entries = function() {
-	    var items = []
-	    this.forEach(function(value, name) { items.push([name, value]) })
-	    return iteratorFor(items)
-	  }
-
-	  if (support.iterable) {
-	    Headers.prototype[Symbol.iterator] = Headers.prototype.entries
-	  }
-
-	  function consumed(body) {
-	    if (body.bodyUsed) {
-	      return Promise.reject(new TypeError('Already read'))
-	    }
-	    body.bodyUsed = true
-	  }
-
-	  function fileReaderReady(reader) {
-	    return new Promise(function(resolve, reject) {
-	      reader.onload = function() {
-	        resolve(reader.result)
-	      }
-	      reader.onerror = function() {
-	        reject(reader.error)
-	      }
-	    })
-	  }
-
-	  function readBlobAsArrayBuffer(blob) {
-	    var reader = new FileReader()
-	    reader.readAsArrayBuffer(blob)
-	    return fileReaderReady(reader)
-	  }
-
-	  function readBlobAsText(blob) {
-	    var reader = new FileReader()
-	    reader.readAsText(blob)
-	    return fileReaderReady(reader)
-	  }
-
-	  function Body() {
-	    this.bodyUsed = false
-
-	    this._initBody = function(body) {
-	      this._bodyInit = body
-	      if (typeof body === 'string') {
-	        this._bodyText = body
-	      } else if (support.blob && Blob.prototype.isPrototypeOf(body)) {
-	        this._bodyBlob = body
-	      } else if (support.formData && FormData.prototype.isPrototypeOf(body)) {
-	        this._bodyFormData = body
-	      } else if (support.searchParams && URLSearchParams.prototype.isPrototypeOf(body)) {
-	        this._bodyText = body.toString()
-	      } else if (!body) {
-	        this._bodyText = ''
-	      } else if (support.arrayBuffer && ArrayBuffer.prototype.isPrototypeOf(body)) {
-	        // Only support ArrayBuffers for POST method.
-	        // Receiving ArrayBuffers happens via Blobs, instead.
-	      } else {
-	        throw new Error('unsupported BodyInit type')
-	      }
-
-	      if (!this.headers.get('content-type')) {
-	        if (typeof body === 'string') {
-	          this.headers.set('content-type', 'text/plain;charset=UTF-8')
-	        } else if (this._bodyBlob && this._bodyBlob.type) {
-	          this.headers.set('content-type', this._bodyBlob.type)
-	        } else if (support.searchParams && URLSearchParams.prototype.isPrototypeOf(body)) {
-	          this.headers.set('content-type', 'application/x-www-form-urlencoded;charset=UTF-8')
-	        }
-	      }
-	    }
-
-	    if (support.blob) {
-	      this.blob = function() {
-	        var rejected = consumed(this)
-	        if (rejected) {
-	          return rejected
-	        }
-
-	        if (this._bodyBlob) {
-	          return Promise.resolve(this._bodyBlob)
-	        } else if (this._bodyFormData) {
-	          throw new Error('could not read FormData body as blob')
-	        } else {
-	          return Promise.resolve(new Blob([this._bodyText]))
-	        }
-	      }
-
-	      this.arrayBuffer = function() {
-	        return this.blob().then(readBlobAsArrayBuffer)
-	      }
-
-	      this.text = function() {
-	        var rejected = consumed(this)
-	        if (rejected) {
-	          return rejected
-	        }
-
-	        if (this._bodyBlob) {
-	          return readBlobAsText(this._bodyBlob)
-	        } else if (this._bodyFormData) {
-	          throw new Error('could not read FormData body as text')
-	        } else {
-	          return Promise.resolve(this._bodyText)
-	        }
-	      }
-	    } else {
-	      this.text = function() {
-	        var rejected = consumed(this)
-	        return rejected ? rejected : Promise.resolve(this._bodyText)
-	      }
-	    }
-
-	    if (support.formData) {
-	      this.formData = function() {
-	        return this.text().then(decode)
-	      }
-	    }
-
-	    this.json = function() {
-	      return this.text().then(JSON.parse)
-	    }
-
-	    return this
-	  }
-
-	  // HTTP methods whose capitalization should be normalized
-	  var methods = ['DELETE', 'GET', 'HEAD', 'OPTIONS', 'POST', 'PUT']
-
-	  function normalizeMethod(method) {
-	    var upcased = method.toUpperCase()
-	    return (methods.indexOf(upcased) > -1) ? upcased : method
-	  }
-
-	  function Request(input, options) {
-	    options = options || {}
-	    var body = options.body
-	    if (Request.prototype.isPrototypeOf(input)) {
-	      if (input.bodyUsed) {
-	        throw new TypeError('Already read')
-	      }
-	      this.url = input.url
-	      this.credentials = input.credentials
-	      if (!options.headers) {
-	        this.headers = new Headers(input.headers)
-	      }
-	      this.method = input.method
-	      this.mode = input.mode
-	      if (!body) {
-	        body = input._bodyInit
-	        input.bodyUsed = true
-	      }
-	    } else {
-	      this.url = input
-	    }
-
-	    this.credentials = options.credentials || this.credentials || 'omit'
-	    if (options.headers || !this.headers) {
-	      this.headers = new Headers(options.headers)
-	    }
-	    this.method = normalizeMethod(options.method || this.method || 'GET')
-	    this.mode = options.mode || this.mode || null
-	    this.referrer = null
-
-	    if ((this.method === 'GET' || this.method === 'HEAD') && body) {
-	      throw new TypeError('Body not allowed for GET or HEAD requests')
-	    }
-	    this._initBody(body)
-	  }
-
-	  Request.prototype.clone = function() {
-	    return new Request(this)
-	  }
-
-	  function decode(body) {
-	    var form = new FormData()
-	    body.trim().split('&').forEach(function(bytes) {
-	      if (bytes) {
-	        var split = bytes.split('=')
-	        var name = split.shift().replace(/\+/g, ' ')
-	        var value = split.join('=').replace(/\+/g, ' ')
-	        form.append(decodeURIComponent(name), decodeURIComponent(value))
-	      }
-	    })
-	    return form
-	  }
-
-	  function headers(xhr) {
-	    var head = new Headers()
-	    var pairs = (xhr.getAllResponseHeaders() || '').trim().split('\n')
-	    pairs.forEach(function(header) {
-	      var split = header.trim().split(':')
-	      var key = split.shift().trim()
-	      var value = split.join(':').trim()
-	      head.append(key, value)
-	    })
-	    return head
-	  }
-
-	  Body.call(Request.prototype)
-
-	  function Response(bodyInit, options) {
-	    if (!options) {
-	      options = {}
-	    }
-
-	    this.type = 'default'
-	    this.status = options.status
-	    this.ok = this.status >= 200 && this.status < 300
-	    this.statusText = options.statusText
-	    this.headers = options.headers instanceof Headers ? options.headers : new Headers(options.headers)
-	    this.url = options.url || ''
-	    this._initBody(bodyInit)
-	  }
-
-	  Body.call(Response.prototype)
-
-	  Response.prototype.clone = function() {
-	    return new Response(this._bodyInit, {
-	      status: this.status,
-	      statusText: this.statusText,
-	      headers: new Headers(this.headers),
-	      url: this.url
-	    })
-	  }
-
-	  Response.error = function() {
-	    var response = new Response(null, {status: 0, statusText: ''})
-	    response.type = 'error'
-	    return response
-	  }
-
-	  var redirectStatuses = [301, 302, 303, 307, 308]
-
-	  Response.redirect = function(url, status) {
-	    if (redirectStatuses.indexOf(status) === -1) {
-	      throw new RangeError('Invalid status code')
-	    }
-
-	    return new Response(null, {status: status, headers: {location: url}})
-	  }
-
-	  self.Headers = Headers
-	  self.Request = Request
-	  self.Response = Response
-
-	  self.fetch = function(input, init) {
-	    return new Promise(function(resolve, reject) {
-	      var request
-	      if (Request.prototype.isPrototypeOf(input) && !init) {
-	        request = input
-	      } else {
-	        request = new Request(input, init)
-	      }
-
-	      var xhr = new XMLHttpRequest()
-
-	      function responseURL() {
-	        if ('responseURL' in xhr) {
-	          return xhr.responseURL
-	        }
-
-	        // Avoid security warnings on getResponseHeader when not allowed by CORS
-	        if (/^X-Request-URL:/m.test(xhr.getAllResponseHeaders())) {
-	          return xhr.getResponseHeader('X-Request-URL')
-	        }
-
-	        return
-	      }
-
-	      xhr.onload = function() {
-	        var options = {
-	          status: xhr.status,
-	          statusText: xhr.statusText,
-	          headers: headers(xhr),
-	          url: responseURL()
-	        }
-	        var body = 'response' in xhr ? xhr.response : xhr.responseText
-	        resolve(new Response(body, options))
-	      }
-
-	      xhr.onerror = function() {
-	        reject(new TypeError('Network request failed'))
-	      }
-
-	      xhr.ontimeout = function() {
-	        reject(new TypeError('Network request failed'))
-	      }
-
-	      xhr.open(request.method, request.url, true)
-
-	      if (request.credentials === 'include') {
-	        xhr.withCredentials = true
-	      }
-
-	      if ('responseType' in xhr && support.blob) {
-	        xhr.responseType = 'blob'
-	      }
-
-	      request.headers.forEach(function(value, name) {
-	        xhr.setRequestHeader(name, value)
-	      })
-
-	      xhr.send(typeof request._bodyInit === 'undefined' ? null : request._bodyInit)
-	    })
-	  }
-	  self.fetch.polyfill = true
-	})(typeof self !== 'undefined' ? self : this);
-
-
-/***/ },
-/* 278 */
-/***/ function(module, exports, __webpack_require__) {
-
 	"use strict";
 
 	Object.defineProperty(exports, "__esModule", {
 	    value: true
 	});
-	exports.apiCallEnded = exports.apiCallStarted = undefined;
-
-	var _actionIdentifiers = __webpack_require__(279);
-
-	var apiCallStarted = exports.apiCallStarted = { type: _actionIdentifiers.API_CALL_STARTED };
-	var apiCallEnded = exports.apiCallEnded = { type: _actionIdentifiers.API_CALL_ENDED };
-
 	exports.default = {
-	    apiCallStarted: apiCallStarted,
-	    apiCallEnded: apiCallEnded
+	    home: {
+	        title: "Welcome to React!",
+	        explanation: "This application is created to show some cool features of React and Redux."
+	    },
+	    login: {
+	        title: "Login",
+	        explanation: "Login to have access to all functionalities"
+	    },
+	    cart: {
+	        myCart: "My Shopping Cart",
+	        add: "Add to my cart",
+	        remove: "Remove item"
+	    },
+	    notFound: {
+	        title: "Ups...",
+	        explanation: "Seems like the page you are looking for does not exist",
+	        backHome: "Get me back to the website!"
+	    }
 	};
 
 /***/ },
-/* 279 */
-/***/ function(module, exports) {
+/* 288 */
+/***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
 
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
-	var ADD_TO_CART = exports.ADD_TO_CART = "ADD_TO_CART";
-	var API_CALL_STARTED = exports.API_CALL_STARTED = "API_CALL_STARTED";
-	var API_CALL_ENDED = exports.API_CALL_ENDED = "API_CALL_ENDED";
-	var GET_PRODUCT = exports.GET_PRODUCT = "GET_PRODUCT";
-	var GET_PRODUCT_COMPLETED = exports.GET_PRODUCT_COMPLETED = "GET_PRODUCT_COMPLETED";
-	var GET_PRODUCT_FAILED = exports.GET_PRODUCT_FAILED = "GET_PRODUCT_FAILED";
-	var GET_PRODUCTS = exports.GET_PRODUCTS = "GET_PRODUCTS";
-	var GET_PRODUCTS_COMPLETED = exports.GET_PRODUCTS_COMPLETED = "GET_PRODUCTS_COMPLETED";
-	var GET_PRODUCTS_FAILED = exports.GET_PRODUCTS_FAILED = "GET_PRODUCTS_FAILED";
-	var LOGIN = exports.LOGIN = "LOGIN";
-	var LOGIN_COMPLETED = exports.LOGIN_COMPLETED = "LOGIN_COMPLETED";
-	var LOGIN_FAILED = exports.LOGIN_FAILED = "LOGIN_FAILED";
-	var LOGOUT = exports.LOGOUT = "LOGOUT";
-	var SET_REDIRECT_AFTER_LOGIN = exports.SET_REDIRECT_AFTER_LOGIN = "SET_REDIRECT_AFTER_LOGIN";
+
+	var _cartItem = __webpack_require__(289);
+
+	Object.defineProperty(exports, "CartItem", {
+	  enumerable: true,
+	  get: function get() {
+	    return _interopRequireDefault(_cartItem).default;
+	  }
+	});
+
+	var _notificationCenter = __webpack_require__(290);
+
+	Object.defineProperty(exports, "NotificationCenter", {
+	  enumerable: true,
+	  get: function get() {
+	    return _interopRequireDefault(_notificationCenter).default;
+	  }
+	});
+
+	var _productEntry = __webpack_require__(291);
+
+	Object.defineProperty(exports, "ProductEntry", {
+	  enumerable: true,
+	  get: function get() {
+	    return _interopRequireDefault(_productEntry).default;
+	  }
+	});
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 /***/ },
-/* 280 */
+/* 289 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -30239,11 +30788,258 @@
 
 	var _react2 = _interopRequireDefault(_react);
 
-	var _reactHelmet = __webpack_require__(263);
+	var _reactRouter = __webpack_require__(198);
+
+	var _dictionary = __webpack_require__(287);
+
+	var _dictionary2 = _interopRequireDefault(_dictionary);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	var CartItem = function CartItem(_ref) {
+	    var item = _ref.item;
+	    var index = _ref.index;
+	    var onRemoveItem = _ref.onRemoveItem;
+	    return _react2.default.createElement(
+	        "div",
+	        { className: "cart-item" },
+	        _react2.default.createElement(
+	            _reactRouter.Link,
+	            { to: "/products/" + item.id },
+	            item.name
+	        ),
+	        " - ",
+	        _react2.default.createElement(
+	            "span",
+	            null,
+	            item.price
+	        ),
+	        _react2.default.createElement(
+	            "span",
+	            { className: "link", onClick: function onClick() {
+	                    return onRemoveItem(index);
+	                } },
+	            _dictionary2.default.cart.remove
+	        )
+	    );
+	};
+
+	var _React$PropTypes = _react2.default.PropTypes;
+	var shape = _React$PropTypes.shape;
+	var string = _React$PropTypes.string;
+	var number = _React$PropTypes.number;
+	var func = _React$PropTypes.func;
+
+	CartItem.propTypes = {
+	    item: shape({
+	        id: number.isRequired,
+	        name: string.isRequired,
+	        price: number.isRequired
+	    }),
+	    index: number.isRequired,
+	    onRemoveItem: func.isRequired
+	};
+
+	exports.default = CartItem;
+
+/***/ },
+/* 290 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+
+	var _react = __webpack_require__(1);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	var _reactRedux = __webpack_require__(172);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	var buildMessage = function buildMessage(message, index) {
+	    return _react2.default.createElement(
+	        "div",
+	        { key: index, className: "message " + message.type },
+	        message.text
+	    );
+	};
+
+	var NotificationCenter = function NotificationCenter(_ref) {
+	    var messages = _ref.messages;
+	    return _react2.default.createElement(
+	        "div",
+	        { className: "notification-center" },
+	        messages.map(buildMessage)
+	    );
+	};
+
+	var _React$PropTypes = _react2.default.PropTypes;
+	var shape = _React$PropTypes.shape;
+	var string = _React$PropTypes.string;
+	var arrayOf = _React$PropTypes.arrayOf;
+
+	NotificationCenter.propTypes = {
+	    messages: arrayOf(shape({
+	        text: string.isRequired,
+	        type: string.isRequired
+	    }))
+	};
+
+	var mapStateToProps = function mapStateToProps(state) {
+	    return {
+	        messages: state.notifications
+	    };
+	};
+
+	exports.default = (0, _reactRedux.connect)(mapStateToProps)(NotificationCenter);
+
+/***/ },
+/* 291 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+
+	var _react = __webpack_require__(1);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	var _reactRouter = __webpack_require__(198);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	var ProductEntry = function ProductEntry(_ref) {
+	    var product = _ref.product;
+	    return _react2.default.createElement(
+	        "div",
+	        { className: "product-box" },
+	        _react2.default.createElement("img", { className: "product-image", src: product.imageUrl, alt: product.name }),
+	        _react2.default.createElement(
+	            _reactRouter.Link,
+	            { to: "/products/" + product.id },
+	            product.name
+	        ),
+	        " - ",
+	        _react2.default.createElement(
+	            "span",
+	            null,
+	            product.price,
+	            " €"
+	        )
+	    );
+	};
+
+	var _React$PropTypes = _react2.default.PropTypes;
+	var shape = _React$PropTypes.shape;
+	var string = _React$PropTypes.string;
+	var number = _React$PropTypes.number;
+
+	ProductEntry.propTypes = {
+	    product: shape({
+	        id: number.isRequired,
+	        imageUrl: string.isRequired,
+	        name: string.isRequired,
+	        price: string.price
+	    })
+	};
+
+	exports.default = ProductEntry;
+
+/***/ },
+/* 292 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	exports.initializeCart = exports.removeFromCart = exports.addToCart = undefined;
+
+	var _createReducer;
+
+	var _utilities = __webpack_require__(267);
+
+	var _utilities2 = __webpack_require__(260);
+
+	function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+	function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
+
+	var ADD_TO_CART = "ADD_TO_CART";
+	var INITIALIZE_CART = "INITIALIZE_CART";
+	var REMOVE_FROM_CART = "REMOVE_FROM_CART";
+
+	var addToCartAction = function addToCartAction(product) {
+	    return {
+	        type: ADD_TO_CART,
+	        payload: {
+	            product: product
+	        }
+	    };
+	};
+
+	var addToCart = exports.addToCart = function addToCart(product) {
+	    return function (dispatch) {
+	        dispatch(addToCartAction(product));
+	        dispatch(_utilities2.Notification.info("Product added to cart"));
+	    };
+	};
+
+	var removeFromCart = exports.removeFromCart = function removeFromCart(index) {
+	    return {
+	        type: REMOVE_FROM_CART,
+	        payload: {
+	            index: index
+	        }
+	    };
+	};
+
+	var initializeCart = exports.initializeCart = function initializeCart(items) {
+	    return {
+	        type: INITIALIZE_CART,
+	        payload: {
+	            items: items
+	        }
+	    };
+	};
+
+	var initialState = [];
+
+	exports.default = (0, _utilities.createReducer)(initialState)((_createReducer = {}, _defineProperty(_createReducer, ADD_TO_CART, function (state, payload) {
+	    return [].concat(_toConsumableArray(state), [payload.product]);
+	}), _defineProperty(_createReducer, INITIALIZE_CART, function (state, payload) {
+	    return payload.items;
+	}), _defineProperty(_createReducer, REMOVE_FROM_CART, function (state, payload) {
+	    return [].concat(_toConsumableArray(state.slice(0, payload.index)), _toConsumableArray(state.slice(payload.index + 1)));
+	}), _createReducer));
+
+/***/ },
+/* 293 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+
+	var _react = __webpack_require__(1);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	var _reactHelmet = __webpack_require__(277);
 
 	var _reactHelmet2 = _interopRequireDefault(_reactHelmet);
 
-	var _dictionary = __webpack_require__(281);
+	var _dictionary = __webpack_require__(287);
 
 	var _dictionary2 = _interopRequireDefault(_dictionary);
 
@@ -30268,27 +31064,7 @@
 	};
 
 /***/ },
-/* 281 */
-/***/ function(module, exports) {
-
-	"use strict";
-
-	Object.defineProperty(exports, "__esModule", {
-	    value: true
-	});
-	exports.default = {
-	    home: {
-	        title: "Welcome to React!",
-	        explanation: "This application is created to show some cool features of working with React and Redux."
-	    },
-	    login: {
-	        title: "Login",
-	        explanation: "Login to have access to all functionalities"
-	    }
-	};
-
-/***/ },
-/* 282 */
+/* 294 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -30301,33 +31077,45 @@
 
 	var _react2 = _interopRequireDefault(_react);
 
-	var _reactRouter = __webpack_require__(198);
-
 	var _reactRedux = __webpack_require__(172);
 
-	var _reactHelmet = __webpack_require__(263);
+	var _reactHelmet = __webpack_require__(277);
 
 	var _reactHelmet2 = _interopRequireDefault(_reactHelmet);
 
-	var _formsyReact = __webpack_require__(283);
-
-	var _formsyReact2 = _interopRequireDefault(_formsyReact);
-
-	var _dictionary = __webpack_require__(281);
+	var _dictionary = __webpack_require__(287);
 
 	var _dictionary2 = _interopRequireDefault(_dictionary);
 
-	var _helpers = __webpack_require__(273);
+	var _utilities = __webpack_require__(260);
 
-	var _sessionActions = __webpack_require__(290);
+	var _session = __webpack_require__(295);
+
+	var _forms = __webpack_require__(296);
+
+	var _helpers = __webpack_require__(307);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+	var _React$PropTypes = _react2.default.PropTypes;
+	var bool = _React$PropTypes.bool;
+	var string = _React$PropTypes.string;
+	var func = _React$PropTypes.func;
+
+
 	var Login = _react2.default.createClass({
 	    displayName: "Login",
+
+	    propTypes: {
+	        isAuthenticated: bool.isRequired,
+	        redirectAfterLogin: string,
+	        onSubmitLogin: func.isRequired,
+	        serverError: string.isRequired
+	    },
+
 	    componentWillReceiveProps: function componentWillReceiveProps(nextProps) {
-	        if (!this.props.isAuthenticated && nextProps.isAuthenticated && this.props.redirectAfterLogin) {
-	            _reactRouter.browserHistory.push(this.props.redirectAfterLogin);
+	        if (!this.props.isAuthenticated && nextProps.isAuthenticated) {
+	            _helpers.Router.redirectTo(this.props.redirectAfterLogin || "/");
 	        }
 	    },
 	    render: function render() {
@@ -30340,35 +31128,7 @@
 	                null,
 	                _dictionary2.default.login.title
 	            ),
-	            _react2.default.createElement(
-	                _formsyReact2.default.Form,
-	                { onValidSubmit: this.props.onSubmitLogin },
-	                _react2.default.createElement(
-	                    "div",
-	                    null,
-	                    _react2.default.createElement(
-	                        "label",
-	                        { htmlFor: "username" },
-	                        "Username: "
-	                    ),
-	                    _react2.default.createElement("input", { type: "text", name: "username" })
-	                ),
-	                _react2.default.createElement(
-	                    "div",
-	                    null,
-	                    _react2.default.createElement(
-	                        "label",
-	                        { htmlFor: "password" },
-	                        "Password: "
-	                    ),
-	                    _react2.default.createElement("input", { type: "password", name: "password" })
-	                ),
-	                _react2.default.createElement(
-	                    "button",
-	                    { type: "submit" },
-	                    "Submit"
-	                )
-	            )
+	            _react2.default.createElement(_forms.LoginForm, { onSubmit: this.props.onSubmitLogin, serverError: this.props.serverError })
 	        );
 	    }
 	});
@@ -30376,15 +31136,15 @@
 	var mapStateToProps = function mapStateToProps(state) {
 	    return {
 	        isAuthenticated: state.session.isAuthenticated,
-	        redirectAfterLogin: state.session.redirectUrl
+	        redirectAfterLogin: state.session.redirectUrl,
+	        serverError: state.serverError
 	    };
 	};
 
 	var mapDispatchToProps = function mapDispatchToProps(dispatch) {
 	    return {
 	        onSubmitLogin: function onSubmitLogin(model) {
-	            var body = {};
-	            dispatch(_helpers.Api.post(_sessionActions.login)(null, body));
+	            dispatch(_utilities.Api.post(_session.login)(null, model));
 	        }
 	    };
 	};
@@ -30392,7 +31152,190 @@
 	exports.default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)(Login);
 
 /***/ },
-/* 283 */
+/* 295 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	exports.initializeSession = exports.setRedirectAfterLogin = exports.logout = exports.login = undefined;
+
+	var _createReducer;
+
+	var _utilities = __webpack_require__(267);
+
+	var _utilities2 = __webpack_require__(260);
+
+	function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+	var LOGIN = "LOGIN";
+	var LOGIN_COMPLETED = "LOGIN_COMPLETED";
+	var LOGOUT = "LOGOUT";
+	var SET_REDIRECT_AFTER_LOGIN = "SET_REDIRECT_AFTER_LOGIN";
+	var INITIALIZE_SESSION = "INITIALIZE_SESSION";
+
+	var mapResponseToPayload = function mapResponseToPayload(response) {
+	    return {
+	        token: response.token
+	    };
+	};
+
+	var urlMapper = function urlMapper() {
+	    return "/login/";
+	};
+	var login = exports.login = (0, _utilities.createAsyncAction)(LOGIN, urlMapper, mapResponseToPayload);
+
+	var logoutAction = {
+	    type: LOGOUT
+	};
+
+	var logout = exports.logout = function logout(dispatch) {
+	    dispatch(logoutAction);
+	    dispatch(_utilities2.Notification.info("Successfully logged out!"));
+	};
+
+	var setRedirectAfterLogin = exports.setRedirectAfterLogin = function setRedirectAfterLogin(redirectUrl) {
+	    return {
+	        type: SET_REDIRECT_AFTER_LOGIN,
+	        payload: {
+	            redirectUrl: redirectUrl
+	        }
+	    };
+	};
+
+	var initializeSession = exports.initializeSession = function initializeSession(token) {
+	    return {
+	        type: INITIALIZE_SESSION,
+	        payload: {
+	            token: token
+	        }
+	    };
+	};
+
+	var initialState = { token: null, isAuthenticated: false };
+
+	exports.default = (0, _utilities.createReducer)(initialState)((_createReducer = {}, _defineProperty(_createReducer, LOGIN_COMPLETED, function (state, payload) {
+	    return Object.assign({}, state, {
+	        token: payload.token,
+	        isAuthenticated: true
+	    });
+	}), _defineProperty(_createReducer, LOGOUT, function () {
+	    return {
+	        token: null,
+	        isAuthenticated: false
+	    };
+	}), _defineProperty(_createReducer, SET_REDIRECT_AFTER_LOGIN, function (state, payload) {
+	    return Object.assign({}, state, {
+	        redirectUrl: payload.redirectUrl
+	    });
+	}), _defineProperty(_createReducer, INITIALIZE_SESSION, function (state, payload) {
+	    return Object.assign({}, state, {
+	        token: payload.token,
+	        isAuthenticated: true
+	    });
+	}), _createReducer));
+
+/***/ },
+/* 296 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+
+	var _loginForm = __webpack_require__(297);
+
+	Object.defineProperty(exports, "LoginForm", {
+	  enumerable: true,
+	  get: function get() {
+	    return _interopRequireDefault(_loginForm).default;
+	  }
+	});
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+/***/ },
+/* 297 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+
+	var _react = __webpack_require__(1);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	var _formsyReact = __webpack_require__(298);
+
+	var _formsyReact2 = _interopRequireDefault(_formsyReact);
+
+	var _formElements = __webpack_require__(305);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	var LoginForm = function LoginForm(_ref) {
+	    var onSubmit = _ref.onSubmit;
+	    var serverError = _ref.serverError;
+	    return _react2.default.createElement(
+	        "div",
+	        null,
+	        _react2.default.createElement(
+	            "div",
+	            { className: "error" },
+	            serverError
+	        ),
+	        _react2.default.createElement(
+	            _formsyReact2.default.Form,
+	            { onValidSubmit: onSubmit },
+	            _react2.default.createElement(
+	                "div",
+	                null,
+	                _react2.default.createElement(
+	                    "label",
+	                    { htmlFor: "username" },
+	                    "Username: "
+	                ),
+	                _react2.default.createElement(_formElements.InputField, { type: "text", name: "username" })
+	            ),
+	            _react2.default.createElement(
+	                "div",
+	                null,
+	                _react2.default.createElement(
+	                    "label",
+	                    { htmlFor: "password" },
+	                    "Password: "
+	                ),
+	                _react2.default.createElement(_formElements.InputField, { type: "password", name: "password" })
+	            ),
+	            _react2.default.createElement(
+	                "button",
+	                { type: "submit" },
+	                "Submit"
+	            )
+	        )
+	    );
+	};
+
+	var _React$PropTypes = _react2.default.PropTypes;
+	var func = _React$PropTypes.func;
+	var string = _React$PropTypes.string;
+
+	LoginForm.propTypes = {
+	    onSubmit: func.isRequired,
+	    serverError: string.isRequired
+	};
+
+	exports.default = LoginForm;
+
+/***/ },
+/* 298 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(global) {'use strict';
@@ -30405,12 +31348,12 @@
 
 	var React = global.React || __webpack_require__(1);
 	var Formsy = {};
-	var validationRules = __webpack_require__(284);
-	var formDataToObject = __webpack_require__(285);
-	var utils = __webpack_require__(286);
-	var Mixin = __webpack_require__(287);
-	var HOC = __webpack_require__(288);
-	var Decorator = __webpack_require__(289);
+	var validationRules = __webpack_require__(299);
+	var formDataToObject = __webpack_require__(300);
+	var utils = __webpack_require__(301);
+	var Mixin = __webpack_require__(302);
+	var HOC = __webpack_require__(303);
+	var Decorator = __webpack_require__(304);
 	var options = {};
 	var emptyArray = [];
 
@@ -30858,7 +31801,7 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
 
 /***/ },
-/* 284 */
+/* 299 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -30943,7 +31886,7 @@
 	module.exports = validations;
 
 /***/ },
-/* 285 */
+/* 300 */
 /***/ function(module, exports) {
 
 	function toObj(source) {
@@ -30994,7 +31937,7 @@
 	}
 
 /***/ },
-/* 286 */
+/* 301 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -31056,12 +31999,12 @@
 	};
 
 /***/ },
-/* 287 */
+/* 302 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(global) {'use strict';
 
-	var utils = __webpack_require__(286);
+	var utils = __webpack_require__(301);
 	var React = global.React || __webpack_require__(1);
 
 	var convertValidationsToObject = function convertValidationsToObject(validations) {
@@ -31236,7 +32179,7 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
 
 /***/ },
-/* 288 */
+/* 303 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(global) {'use strict';
@@ -31244,7 +32187,7 @@
 	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
 	var React = global.React || __webpack_require__(1);
-	var Mixin = __webpack_require__(287);
+	var Mixin = __webpack_require__(302);
 	module.exports = function (Component) {
 	  return React.createClass({
 	    displayName: 'Formsy(' + getDisplayName(Component) + ')',
@@ -31277,7 +32220,7 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
 
 /***/ },
-/* 289 */
+/* 304 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(global) {'use strict';
@@ -31285,7 +32228,7 @@
 	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
 	var React = global.React || __webpack_require__(1);
-	var Mixin = __webpack_require__(287);
+	var Mixin = __webpack_require__(302);
 	module.exports = function () {
 	  return function (Component) {
 	    return React.createClass({
@@ -31315,7 +32258,28 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
 
 /***/ },
-/* 290 */
+/* 305 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+
+	var _inputField = __webpack_require__(306);
+
+	Object.defineProperty(exports, "InputField", {
+	  enumerable: true,
+	  get: function get() {
+	    return _interopRequireDefault(_inputField).default;
+	  }
+	});
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+/***/ },
+/* 306 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -31323,46 +32287,158 @@
 	Object.defineProperty(exports, "__esModule", {
 	    value: true
 	});
-	exports.setRedirectAfterLogin = exports.logout = exports.login = undefined;
 
-	var _actionIdentifiers = __webpack_require__(279);
+	var _react = __webpack_require__(1);
 
-	var Actions = _interopRequireWildcard(_actionIdentifiers);
+	var _react2 = _interopRequireDefault(_react);
 
-	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+	var _formsyReact = __webpack_require__(298);
 
-	var login = exports.login = {
-	    name: Actions.LOGIN,
-	    started: {
-	        type: Actions.LOGIN
+	var _formsyReact2 = _interopRequireDefault(_formsyReact);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	var string = _react2.default.PropTypes.string;
+
+
+	var InputField = _react2.default.createClass({
+	    displayName: "InputField",
+
+	    propTypes: {
+	        type: string.isRequired
 	    },
-	    completed: function completed(response) {
-	        return {
-	            type: Actions.LOGIN_COMPLETED,
-	            token: response.token
-	        };
+
+	    mixins: [_formsyReact2.default.Mixin],
+
+	    changeValue: function changeValue(event) {
+	        this.setValue(event.currentTarget.value);
 	    },
-	    failed: function failed(error) {
-	        return {
-	            type: Actions.LOGIN_FAILED,
-	            message: error.message
-	        };
+	    render: function render() {
+	        var errorClass = this.showError() ? "error" : null;
+	        var className = this.showRequired() ? "required" : errorClass;
+	        var errorMessage = this.getErrorMessage();
+
+	        return _react2.default.createElement(
+	            "div",
+	            { className: className },
+	            _react2.default.createElement("input", { type: this.props.type, onChange: this.changeValue }),
+	            _react2.default.createElement(
+	                "span",
+	                null,
+	                errorMessage
+	            )
+	        );
+	    }
+	});
+
+	InputField.propTypes = {
+	    type: string.isRequired
+	};
+
+	exports.default = InputField;
+
+/***/ },
+/* 307 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+
+	var _router = __webpack_require__(308);
+
+	Object.defineProperty(exports, "Router", {
+	  enumerable: true,
+	  get: function get() {
+	    return _interopRequireDefault(_router).default;
+	  }
+	});
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+/***/ },
+/* 308 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+
+	var _reactRouter = __webpack_require__(198);
+
+	var redirectUrl = "";
+
+	exports.default = {
+	    redirectTo: function redirectTo(url) {
+	        if (typeof document === "undefined") {
+	            redirectUrl = url;
+	        } else {
+	            _reactRouter.browserHistory.push(url);
+	        }
+	    },
+	    getRedirectUrl: function getRedirectUrl() {
+	        return redirectUrl;
+	    },
+	    clearRedirectUrl: function clearRedirectUrl() {
+	        redirectUrl = "";
 	    }
 	};
 
-	var logout = exports.logout = {
-	    type: Actions.LOGOUT
-	};
+/***/ },
+/* 309 */
+/***/ function(module, exports, __webpack_require__) {
 
-	var setRedirectAfterLogin = exports.setRedirectAfterLogin = function setRedirectAfterLogin(redirectUrl) {
-	    return {
-	        type: Actions.SET_REDIRECT_AFTER_LOGIN,
-	        redirectUrl: redirectUrl
-	    };
+	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+
+	var _react = __webpack_require__(1);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	var _reactRouter = __webpack_require__(198);
+
+	var _reactHelmet = __webpack_require__(277);
+
+	var _reactHelmet2 = _interopRequireDefault(_reactHelmet);
+
+	var _dictionary = __webpack_require__(287);
+
+	var _dictionary2 = _interopRequireDefault(_dictionary);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	exports.default = function () {
+	    return _react2.default.createElement(
+	        "div",
+	        null,
+	        _react2.default.createElement(_reactHelmet2.default, { title: _dictionary2.default.notFound.title }),
+	        _react2.default.createElement(
+	            "h1",
+	            null,
+	            _dictionary2.default.notFound.title
+	        ),
+	        _react2.default.createElement(
+	            "p",
+	            null,
+	            _dictionary2.default.notFound.explanation
+	        ),
+	        _react2.default.createElement(
+	            _reactRouter.Link,
+	            { to: "/" },
+	            _dictionary2.default.notFound.backHome
+	        )
+	    );
 	};
 
 /***/ },
-/* 291 */
+/* 310 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -31377,21 +32453,43 @@
 
 	var _reactRedux = __webpack_require__(172);
 
-	var _productActions = __webpack_require__(292);
+	var _productDetails = __webpack_require__(311);
 
-	var _helpers = __webpack_require__(273);
+	var _cart = __webpack_require__(292);
+
+	var _utilities = __webpack_require__(260);
+
+	var _dictionary = __webpack_require__(287);
+
+	var _dictionary2 = _interopRequireDefault(_dictionary);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-	var loadProduct = _helpers.Api.get(_productActions.fetchProduct);
+	var loadProduct = _utilities.Api.get(_productDetails.fetchProduct);
+
+	var _React$PropTypes = _react2.default.PropTypes;
+	var bool = _React$PropTypes.bool;
+	var func = _React$PropTypes.func;
+	var shape = _React$PropTypes.shape;
+	var number = _React$PropTypes.number;
+	var string = _React$PropTypes.string;
+
 
 	var ProductDetails = _react2.default.createClass({
 	    displayName: "ProductDetails",
 
 	    propTypes: {
 	        params: _react2.default.PropTypes.object,
-	        product: _react2.default.PropTypes.object.isRequired,
-	        dispatch: _react2.default.PropTypes.func
+	        product: shape({
+	            id: number,
+	            name: string,
+	            price: number,
+	            description: string,
+	            imageUrl: string
+	        }),
+	        isAuthenticated: bool.isRequired,
+	        fetchProduct: func.isRequired,
+	        onAddToCart: func.isRequired
 	    },
 
 	    statics: {
@@ -31403,11 +32501,15 @@
 
 	    componentDidMount: function componentDidMount() {
 	        if (this.props.product.id !== parseInt(this.props.params.id, 10)) {
-	            this.props.dispatch(loadProduct({ id: this.props.params.id }));
+	            this.props.fetchProduct(this.props.params.id);
 	        }
 	    },
 	    render: function render() {
-	        var product = this.props.product;
+	        var _props = this.props;
+	        var product = _props.product;
+	        var isAuthenticated = _props.isAuthenticated;
+	        var onAddToCart = _props.onAddToCart;
+
 	        return _react2.default.createElement(
 	            "div",
 	            null,
@@ -31421,17 +32523,26 @@
 	                null,
 	                product.name
 	            ),
+	            _react2.default.createElement("img", { className: "product-image", src: product.imageUrl, alt: product.name }),
 	            _react2.default.createElement(
 	                "p",
 	                null,
-	                "Price: $",
-	                product.price
+	                "Price: ",
+	                product.price,
+	                " €"
 	            ),
 	            _react2.default.createElement(
 	                "p",
 	                null,
 	                "Description: ",
 	                product.description
+	            ),
+	            isAuthenticated && _react2.default.createElement(
+	                "span",
+	                { className: "link", onClick: function onClick() {
+	                        return onAddToCart(product);
+	                    } },
+	                _dictionary2.default.cart.add
 	            )
 	        );
 	    }
@@ -31439,14 +32550,26 @@
 
 	var mapStateToProps = function mapStateToProps(state) {
 	    return {
-	        product: state.selectedProduct
+	        product: state.selectedProduct,
+	        isAuthenticated: state.session.isAuthenticated
 	    };
 	};
 
-	exports.default = (0, _reactRedux.connect)(mapStateToProps)(ProductDetails);
+	var mapDispatchToProps = function mapDispatchToProps(dispatch) {
+	    return {
+	        onAddToCart: function onAddToCart(product) {
+	            return dispatch((0, _cart.addToCart)(product));
+	        },
+	        fetchProduct: function fetchProduct(id) {
+	            return dispatch(loadProduct({ id: id }));
+	        }
+	    };
+	};
+
+	exports.default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)(ProductDetails);
 
 /***/ },
-/* 292 */
+/* 311 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -31454,61 +32577,38 @@
 	Object.defineProperty(exports, "__esModule", {
 	    value: true
 	});
-	exports.fetchProducts = exports.fetchProduct = exports.addToCart = undefined;
+	exports.fetchProduct = undefined;
 
-	var _actionIdentifiers = __webpack_require__(279);
+	var _createReducer;
 
-	var Actions = _interopRequireWildcard(_actionIdentifiers);
+	var _utilities = __webpack_require__(267);
 
-	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+	function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
-	var addToCart = exports.addToCart = function addToCart(product) {
+	var GET_PRODUCT = "GET_PRODUCT";
+	var GET_PRODUCT_COMPLETED = "GET_PRODUCT_COMPLETED";
+
+	var mapResponseToPayload = function mapResponseToPayload(response) {
 	    return {
-	        type: Actions.ADD_TO_CART,
-	        product: product
+	        product: response.product
 	    };
 	};
 
-	var fetchProduct = exports.fetchProduct = {
-	    name: Actions.GET_PRODUCT,
-	    started: {
-	        type: Actions.GET_PRODUCT
-	    },
-	    completed: function completed(response) {
-	        return {
-	            type: Actions.GET_PRODUCT_COMPLETED,
-	            product: response.product
-	        };
-	    },
-	    failed: function failed(error) {
-	        return {
-	            type: Actions.GET_PRODUCT_FAILED,
-	            message: error.message
-	        };
-	    }
+	var urlMapper = function urlMapper(params) {
+	    return "/products/" + params.id;
 	};
+	var fetchProduct = exports.fetchProduct = (0, _utilities.createAsyncAction)(GET_PRODUCT, urlMapper, mapResponseToPayload);
 
-	var fetchProducts = exports.fetchProducts = {
-	    name: Actions.GET_PRODUCTS,
-	    started: {
-	        type: Actions.GET_PRODUCTS
-	    },
-	    completed: function completed(response) {
-	        return {
-	            type: Actions.GET_PRODUCTS_COMPLETED,
-	            products: response.products
-	        };
-	    },
-	    failed: function failed(error) {
-	        return {
-	            type: Actions.GET_PRODUCTS_FAILED,
-	            message: error.message
-	        };
-	    }
-	};
+	var initialState = {};
+
+	exports.default = (0, _utilities.createReducer)(initialState)((_createReducer = {}, _defineProperty(_createReducer, GET_PRODUCT, function () {
+	    return initialState;
+	}), _defineProperty(_createReducer, GET_PRODUCT_COMPLETED, function (state, payload) {
+	    return payload.product;
+	}), _createReducer));
 
 /***/ },
-/* 293 */
+/* 312 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -31523,26 +32623,32 @@
 
 	var _reactRedux = __webpack_require__(172);
 
-	var _reactHelmet = __webpack_require__(263);
+	var _reactHelmet = __webpack_require__(277);
 
 	var _reactHelmet2 = _interopRequireDefault(_reactHelmet);
 
-	var _productActions = __webpack_require__(292);
+	var _productList = __webpack_require__(313);
 
-	var _helpers = __webpack_require__(273);
+	var _utilities = __webpack_require__(260);
 
-	var _components = __webpack_require__(294);
+	var _components = __webpack_require__(288);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-	var loadProducts = _helpers.Api.get(_productActions.fetchProducts);
+	var loadProducts = _utilities.Api.get(_productList.fetchProducts);
+
+	var _React$PropTypes = _react2.default.PropTypes;
+	var arrayOf = _React$PropTypes.arrayOf;
+	var func = _React$PropTypes.func;
+	var object = _React$PropTypes.object;
+
 
 	var ProductList = _react2.default.createClass({
 	    displayName: "ProductList",
 
 	    propTypes: {
-	        products: _react2.default.PropTypes.array,
-	        dispatch: _react2.default.PropTypes.func
+	        products: arrayOf(object).isRequired,
+	        dispatch: func.isRequired
 	    },
 
 	    statics: {
@@ -31550,7 +32656,9 @@
 	    },
 
 	    componentDidMount: function componentDidMount() {
-	        this.props.dispatch(loadProducts);
+	        if (this.props.products.length === 0) {
+	            this.props.dispatch(loadProducts());
+	        }
 	    },
 	    render: function render() {
 	        var products = this.props.products;
@@ -31579,7 +32687,7 @@
 	exports.default = (0, _reactRedux.connect)(mapStateToProps)(ProductList);
 
 /***/ },
-/* 294 */
+/* 313 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -31587,61 +32695,34 @@
 	Object.defineProperty(exports, "__esModule", {
 	    value: true
 	});
-	exports.ProductEntry = undefined;
+	exports.fetchProducts = undefined;
 
-	var _productEntry = __webpack_require__(295);
+	var _utilities = __webpack_require__(267);
 
-	var _productEntry2 = _interopRequireDefault(_productEntry);
+	function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	var GET_PRODUCTS = "GET_PRODUCTS";
+	var GET_PRODUCTS_COMPLETED = "GET_PRODUCTS_COMPLETED";
 
-	exports.ProductEntry = _productEntry2.default;
-
-/***/ },
-/* 295 */
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
-
-	Object.defineProperty(exports, "__esModule", {
-	    value: true
-	});
-
-	var _react = __webpack_require__(1);
-
-	var _react2 = _interopRequireDefault(_react);
-
-	var _reactRouter = __webpack_require__(198);
-
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-	var ProductEntry = function ProductEntry(_ref) {
-	    var product = _ref.product;
-	    return _react2.default.createElement(
-	        "div",
-	        null,
-	        _react2.default.createElement(
-	            _reactRouter.Link,
-	            { to: "/products/" + product.id },
-	            product.name
-	        ),
-	        " - ",
-	        _react2.default.createElement(
-	            "span",
-	            null,
-	            product.price
-	        )
-	    );
+	var mapResponseToPayload = function mapResponseToPayload(response) {
+	    return {
+	        products: response.products
+	    };
 	};
 
-	ProductEntry.propTypes = {
-	    product: _react2.default.PropTypes.object
+	var urlMapper = function urlMapper() {
+	    return "/products/";
 	};
+	var fetchProducts = exports.fetchProducts = (0, _utilities.createAsyncAction)(GET_PRODUCTS, urlMapper, mapResponseToPayload);
 
-	exports.default = ProductEntry;
+	var initialState = [];
+
+	exports.default = (0, _utilities.createReducer)(initialState)(_defineProperty({}, GET_PRODUCTS_COMPLETED, function (state, payload) {
+	    return payload.products;
+	}));
 
 /***/ },
-/* 296 */
+/* 314 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -31658,17 +32739,33 @@
 
 	var _reactRouter = __webpack_require__(198);
 
+	var _components = __webpack_require__(288);
+
+	var _session = __webpack_require__(295);
+
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	var Layout = function Layout(_ref) {
 	    var showSpinner = _ref.showSpinner;
+	    var isAuthenticated = _ref.isAuthenticated;
 	    var children = _ref.children;
+	    var onLogout = _ref.onLogout;
 
 	    var spinner = showSpinner ? _react2.default.createElement(
-	        "span",
-	        null,
-	        "Loading..."
+	        "div",
+	        { className: "overlay" },
+	        _react2.default.createElement("span", { className: "spinner" })
 	    ) : "";
+
+	    var userLink = isAuthenticated ? _react2.default.createElement(
+	        "span",
+	        { className: "navlink", onClick: onLogout },
+	        "Logout"
+	    ) : _react2.default.createElement(
+	        _reactRouter.Link,
+	        { className: "navlink", to: "/login" },
+	        "Login"
+	    );
 
 	    return _react2.default.createElement(
 	        "div",
@@ -31678,63 +32775,83 @@
 	            null,
 	            _react2.default.createElement(
 	                _reactRouter.Link,
-	                { to: "/" },
+	                { className: "navlink", to: "/" },
 	                "Home"
 	            ),
 	            _react2.default.createElement(
 	                _reactRouter.Link,
-	                { to: "/products" },
+	                { className: "navlink", to: "/products" },
 	                "Products"
 	            ),
 	            _react2.default.createElement(
 	                _reactRouter.Link,
-	                { to: "/my-cart" },
+	                { className: "navlink", to: "/my-cart" },
 	                "My Cart"
-	            )
+	            ),
+	            userLink
 	        ),
 	        _react2.default.createElement(
 	            "div",
 	            null,
 	            spinner,
 	            children
-	        )
+	        ),
+	        _react2.default.createElement(_components.NotificationCenter, null)
 	    );
 	};
 
+	var _React$PropTypes = _react2.default.PropTypes;
+	var bool = _React$PropTypes.bool;
+	var func = _React$PropTypes.func;
+	var object = _React$PropTypes.object;
+
 	Layout.propTypes = {
-	    showSpinner: _react2.default.PropTypes.bool,
-	    children: _react2.default.PropTypes.object
+	    showSpinner: bool.isRequired,
+	    isAuthenticated: bool.isRequired,
+	    children: object,
+	    onLogout: func.isRequired
 	};
 
-	function mapStateToProps(state) {
+	var mapStateToProps = function mapStateToProps(state) {
 	    return {
-	        showSpinner: state.busy > 0
+	        showSpinner: state.busy > 0,
+	        isAuthenticated: state.session.isAuthenticated
 	    };
-	}
+	};
 
-	exports.default = (0, _reactRedux.connect)(mapStateToProps)(Layout);
+	var mapDispatchToProps = function mapDispatchToProps(dispatch) {
+	    return {
+	        onLogout: function onLogout() {
+	            return dispatch(_session.logout);
+	        }
+	    };
+	};
+
+	exports.default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)(Layout);
 
 /***/ },
-/* 297 */
+/* 315 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
 
 	Object.defineProperty(exports, "__esModule", {
-	    value: true
+	  value: true
 	});
-	exports.withAuthentication = undefined;
 
-	var _withAuthentication = __webpack_require__(298);
+	var _withAuthentication = __webpack_require__(316);
 
-	var _withAuthentication2 = _interopRequireDefault(_withAuthentication);
+	Object.defineProperty(exports, "withAuthentication", {
+	  enumerable: true,
+	  get: function get() {
+	    return _interopRequireDefault(_withAuthentication).default;
+	  }
+	});
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-	exports.withAuthentication = _withAuthentication2.default;
-
 /***/ },
-/* 298 */
+/* 316 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -31750,38 +32867,28 @@
 
 	var _reactRedux = __webpack_require__(172);
 
-	var _reactRouter = __webpack_require__(198);
-
-	var _sessionActions = __webpack_require__(290);
+	var _helpers = __webpack_require__(307);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+	var bool = _react2.default.PropTypes.bool;
 	function withAuthentication(WrappedComponent) {
 	    var AuthComponent = _react2.default.createClass({
 	        displayName: "AuthComponent",
 
 	        propTypes: {
-	            isAuthenticated: _react2.default.PropTypes.bool,
-	            redirectAfterLogin: _react2.default.PropTypes.string,
-	            location: _react2.default.PropTypes.shape({
-	                pathname: _react2.default.PropTypes.string
-	            }),
-	            onRedirectToLogin: _react2.default.PropTypes.func
+	            isAuthenticated: bool.isRequired
 	        },
 
 	        componentWillMount: function componentWillMount() {
 	            if (!this.props.isAuthenticated) {
-	                this.redirectIfGuest();
+	                _helpers.Router.redirectTo("/login");
 	            }
 	        },
 	        componentWillReceiveProps: function componentWillReceiveProps(nextProps) {
 	            if (!nextProps.isAuthenticated) {
-	                this.redirectIfGuest();
+	                _helpers.Router.redirectTo("/login");
 	            }
-	        },
-	        redirectIfGuest: function redirectIfGuest() {
-	            this.props.onRedirectToLogin(this.props.location.pathname);
-	            _reactRouter.browserHistory.push("/login");
 	        },
 	        render: function render() {
 	            return _react2.default.createElement(
@@ -31794,24 +32901,15 @@
 
 	    var mapStateToProps = function mapStateToProps(state) {
 	        return {
-	            isAuthenticated: state.session.isAuthenticated,
-	            redirectAfterLogin: state.session.redirectUrl
+	            isAuthenticated: state.session.isAuthenticated
 	        };
 	    };
 
-	    var mapDispatchToProps = function mapDispatchToProps(dispatch) {
-	        return {
-	            onRedirectToLogin: function onRedirectToLogin(url) {
-	                return dispatch((0, _sessionActions.setRedirectAfterLogin)(url));
-	            }
-	        };
-	    };
-
-	    return (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)(AuthComponent);
+	    return (0, _reactRedux.connect)(mapStateToProps)(AuthComponent);
 	}
 
 /***/ },
-/* 299 */
+/* 317 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -31823,32 +32921,40 @@
 
 	var _redux = __webpack_require__(179);
 
-	var _reduxThunk = __webpack_require__(300);
+	var _reduxThunk = __webpack_require__(318);
 
 	var _reduxThunk2 = _interopRequireDefault(_reduxThunk);
 
-	var _reduxLogger = __webpack_require__(301);
+	var _reduxLogger = __webpack_require__(319);
 
 	var _reduxLogger2 = _interopRequireDefault(_reduxLogger);
 
-	var _reducers = __webpack_require__(302);
+	var _middlewares = __webpack_require__(320);
 
-	var _reducers2 = _interopRequireDefault(_reducers);
+	var _ducks = __webpack_require__(323);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	function configureStore(initialState) {
 	    var loggerMiddleware = (0, _reduxLogger2.default)();
 
-	    var createStoreWithMiddleware = (0, _redux.applyMiddleware)(
-	    // loggerMiddleware,
-	    _reduxThunk2.default)(_redux.createStore);
+	    var createStoreWithMiddleware = (0, _redux.applyMiddleware)(loggerMiddleware, _reduxThunk2.default, _middlewares.storeAuthToken, _middlewares.persistCart)(_redux.createStore);
 
-	    return createStoreWithMiddleware(_reducers2.default, initialState);
+	    var combinedReducer = (0, _redux.combineReducers)({
+	        busy: _ducks.busy,
+	        cart: _ducks.cart,
+	        notifications: _ducks.notifications,
+	        products: _ducks.products,
+	        selectedProduct: _ducks.selectedProduct,
+	        serverError: _ducks.serverError,
+	        session: _ducks.session
+	    });
+
+	    return createStoreWithMiddleware(combinedReducer, initialState);
 	}
 
 /***/ },
-/* 300 */
+/* 318 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -31876,7 +32982,7 @@
 	exports['default'] = thunk;
 
 /***/ },
-/* 301 */
+/* 319 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -32109,44 +33215,37 @@
 	module.exports = createLogger;
 
 /***/ },
-/* 302 */
+/* 320 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
 
 	Object.defineProperty(exports, "__esModule", {
-	    value: true
+	  value: true
 	});
 
-	var _redux = __webpack_require__(179);
+	var _persistCart = __webpack_require__(321);
 
-	var _busyReducer = __webpack_require__(303);
+	Object.defineProperty(exports, "persistCart", {
+	  enumerable: true,
+	  get: function get() {
+	    return _interopRequireDefault(_persistCart).default;
+	  }
+	});
 
-	var _busyReducer2 = _interopRequireDefault(_busyReducer);
+	var _storeAuthToken = __webpack_require__(322);
 
-	var _productDetailsReducer = __webpack_require__(304);
-
-	var _productDetailsReducer2 = _interopRequireDefault(_productDetailsReducer);
-
-	var _productListReducer = __webpack_require__(305);
-
-	var _productListReducer2 = _interopRequireDefault(_productListReducer);
-
-	var _sessionReducer = __webpack_require__(306);
-
-	var _sessionReducer2 = _interopRequireDefault(_sessionReducer);
+	Object.defineProperty(exports, "storeAuthToken", {
+	  enumerable: true,
+	  get: function get() {
+	    return _interopRequireDefault(_storeAuthToken).default;
+	  }
+	});
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-	exports.default = (0, _redux.combineReducers)({
-	    busy: _busyReducer2.default,
-	    selectedProduct: _productDetailsReducer2.default,
-	    products: _productListReducer2.default,
-	    session: _sessionReducer2.default
-	});
-
 /***/ },
-/* 303 */
+/* 321 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -32155,28 +33254,28 @@
 	    value: true
 	});
 
-	var _actionIdentifiers = __webpack_require__(279);
+	var _utilities = __webpack_require__(260);
 
-	var initialState = 0;
+	var storeAuthToken = function storeAuthToken(store) {
+	    return function (next) {
+	        return function (action) {
+	            var oldCart = store.getState().cart;
+	            var result = next(action);
+	            var newCart = store.getState().cart;
 
-	exports.default = function () {
-	    var state = arguments.length <= 0 || arguments[0] === undefined ? initialState : arguments[0];
-	    var action = arguments[1];
+	            if (oldCart.length !== newCart.length) {
+	                _utilities.LocalStorage.saveCart(newCart);
+	            }
 
-	    switch (action.type) {
-
-	        case _actionIdentifiers.API_CALL_STARTED:
-	            return state + 1;
-	        case _actionIdentifiers.API_CALL_ENDED:
-	            return state - 1;
-
-	        default:
-	            return state;
-	    }
+	            return result;
+	        };
+	    };
 	};
 
+	exports.default = storeAuthToken;
+
 /***/ },
-/* 304 */
+/* 322 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -32185,29 +33284,106 @@
 	    value: true
 	});
 
-	var _actionIdentifiers = __webpack_require__(279);
+	var _utilities = __webpack_require__(260);
 
-	var initialState = {};
+	var storeAuthToken = function storeAuthToken(store) {
+	    return function (next) {
+	        return function (action) {
+	            var oldToken = store.getState().session.token;
+	            var result = next(action);
+	            var newToken = store.getState().session.token;
+	            if (oldToken !== newToken) {
+	                if (newToken) {
+	                    _utilities.Cookies.set("token", newToken);
+	                } else {
+	                    _utilities.Cookies.remove("token");
+	                }
+	            }
 
-	exports.default = function () {
-	    var state = arguments.length <= 0 || arguments[0] === undefined ? initialState : arguments[0];
-	    var action = arguments[1];
-
-	    switch (action.type) {
-
-	        case _actionIdentifiers.GET_PRODUCT:
-	            return {};
-
-	        case _actionIdentifiers.GET_PRODUCT_COMPLETED:
-	            return action.product;
-
-	        default:
-	            return state;
-	    }
+	            return result;
+	        };
+	    };
 	};
 
+	exports.default = storeAuthToken;
+
 /***/ },
-/* 305 */
+/* 323 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+
+	var _busy = __webpack_require__(270);
+
+	Object.defineProperty(exports, "busy", {
+	  enumerable: true,
+	  get: function get() {
+	    return _interopRequireDefault(_busy).default;
+	  }
+	});
+
+	var _cart = __webpack_require__(292);
+
+	Object.defineProperty(exports, "cart", {
+	  enumerable: true,
+	  get: function get() {
+	    return _interopRequireDefault(_cart).default;
+	  }
+	});
+
+	var _notifications = __webpack_require__(266);
+
+	Object.defineProperty(exports, "notifications", {
+	  enumerable: true,
+	  get: function get() {
+	    return _interopRequireDefault(_notifications).default;
+	  }
+	});
+
+	var _productDetails = __webpack_require__(311);
+
+	Object.defineProperty(exports, "selectedProduct", {
+	  enumerable: true,
+	  get: function get() {
+	    return _interopRequireDefault(_productDetails).default;
+	  }
+	});
+
+	var _productList = __webpack_require__(313);
+
+	Object.defineProperty(exports, "products", {
+	  enumerable: true,
+	  get: function get() {
+	    return _interopRequireDefault(_productList).default;
+	  }
+	});
+
+	var _serverError = __webpack_require__(324);
+
+	Object.defineProperty(exports, "serverError", {
+	  enumerable: true,
+	  get: function get() {
+	    return _interopRequireDefault(_serverError).default;
+	  }
+	});
+
+	var _session = __webpack_require__(295);
+
+	Object.defineProperty(exports, "session", {
+	  enumerable: true,
+	  get: function get() {
+	    return _interopRequireDefault(_session).default;
+	  }
+	});
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+/***/ },
+/* 324 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -32216,65 +33392,15 @@
 	    value: true
 	});
 
-	var _actionIdentifiers = __webpack_require__(279);
+	var _utilities = __webpack_require__(267);
 
-	var initialState = [];
+	var initialState = "";
 
-	exports.default = function () {
-	    var state = arguments.length <= 0 || arguments[0] === undefined ? initialState : arguments[0];
-	    var action = arguments[1];
-
-	    switch (action.type) {
-
-	        case _actionIdentifiers.GET_PRODUCTS_COMPLETED:
-	            return action.products;
-
-	        default:
-	            return state;
+	exports.default = (0, _utilities.createReducer)(initialState)({
+	    LOGIN_FAILED: function LOGIN_FAILED(state, payload) {
+	        return payload.message;
 	    }
-	};
-
-/***/ },
-/* 306 */
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
-
-	Object.defineProperty(exports, "__esModule", {
-	    value: true
 	});
-
-	var _actionIdentifiers = __webpack_require__(279);
-
-	var initialState = { token: null };
-
-	exports.default = function () {
-	    var state = arguments.length <= 0 || arguments[0] === undefined ? initialState : arguments[0];
-	    var action = arguments[1];
-
-	    switch (action.type) {
-
-	        case _actionIdentifiers.LOGIN_COMPLETED:
-	            return Object.assign({}, state, {
-	                token: action.token,
-	                isAuthenticated: true
-	            });
-
-	        case _actionIdentifiers.LOGOUT:
-	            return {
-	                token: null,
-	                isAuthenticated: false
-	            };
-
-	        case _actionIdentifiers.SET_REDIRECT_AFTER_LOGIN:
-	            return Object.assign({}, state, {
-	                redirectUrl: action.redirectUrl
-	            });
-
-	        default:
-	            return state;
-	    }
-	};
 
 /***/ }
 /******/ ]);
