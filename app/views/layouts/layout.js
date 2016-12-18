@@ -41,8 +41,8 @@ Layout.propTypes = {
 };
 
 const mapStateToProps = ( state ) => ( {
-    showSpinner: state.busy > 0,
-    isAuthenticated: state.session.isAuthenticated,
+    showSpinner: state.get( "busy" ) > 0,
+    isAuthenticated: state.get( "session" ).get( "isAuthenticated" ),
 } );
 
 const mapDispatchToProps = ( dispatch ) => ( {

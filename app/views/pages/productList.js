@@ -40,7 +40,7 @@ const ProductList = React.createClass( {
 } );
 
 const mapStateToProps = ( state ) => ( {
-    products: state.products,
+    products: state.get( "products" ),
 } );
 
 export default connect( mapStateToProps )( ProductList );

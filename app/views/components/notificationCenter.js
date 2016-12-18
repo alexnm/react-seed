@@ -2,7 +2,7 @@ import React from "react";
 import { connect } from "react-redux";
 
 const buildMessage = ( message, index ) => (
-    <div key={ index } className={ `message ${ message.type }` }>{ message.text }</div>
+    <div key={ index } className={ `message ${ message.get( "type" ) }` }>{ message.get( "text" ) }</div>
 );
 
 const NotificationCenter = ( { messages } ) => (
@@ -20,7 +20,7 @@ NotificationCenter.propTypes = {
 };
 
 const mapStateToProps = ( state ) => ( {
-    messages: state.notifications,
+    messages: state.get( "notifications" ),
 } );
 
 export default connect( mapStateToProps )( NotificationCenter );

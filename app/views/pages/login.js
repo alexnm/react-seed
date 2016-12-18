@@ -36,9 +36,9 @@ const Login = React.createClass( {
 } );
 
 const mapStateToProps = ( state ) => ( {
-    isAuthenticated: state.session.isAuthenticated,
-    redirectAfterLogin: state.session.redirectUrl,
-    serverError: state.serverError,
+    isAuthenticated: state.get( "session" ).get( "isAuthenticated" ),
+    redirectAfterLogin: state.get( "session" ).get( "redirectUrl" ),
+    serverError: state.get( "serverError" ),
 } );
 
 const mapDispatchToProps = ( dispatch ) => ( {

@@ -3,10 +3,10 @@ import { Link } from "react-router";
 
 const ProductEntry = ( { product } ) => (
     <div className="product-box">
-        <img className="product-image" src={ product.imageUrl } alt={ product.name } />
-        <Link to={ `/products/${ product.id }` }>
-            { product.name }
-        </Link> - <span>{ product.price } €</span>
+        <img className="product-image" src={ product.get( "imageUrl" ) } alt={ product.get( "name" ) } />
+        <Link to={ `/products/${ product.get( "id" ) }` }>
+            { product.get( "name" ) }
+        </Link> - <span>{ product.get( "price" ) } €</span>
     </div>
 );
 

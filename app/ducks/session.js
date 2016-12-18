@@ -1,3 +1,4 @@
+import Immutable from "immutable";
 import { createReducer, createAsyncAction } from "./utilities";
 import { Notification } from "../utilities";
 
@@ -37,22 +38,21 @@ export const initializeSession = ( token ) => ( {
     },
 } );
 
-const initialState = { token: null, isAuthenticated: false };
+const initialState = Immutable.Map( { token: null, isAuthenticated: false } );
 
 export default createReducer( initialState )( {
-    [ LOGIN_COMPLETED ]: ( state, payload ) => Object.assign( { }, state, {
-        token: payload.token,
-        isAuthenticated: true,
+    [ LOGIN_COMPLETED ]: ( state, payload ) => state.withMutations( map => {
+        map.set( "token", payload.token )
+           .set( "isAuthenticated", true )
     } ),
-    [ LOGOUT ]: ( ) => ( {
-        token: null,
-        isAuthenticated: false,
+    [ LOGOUT ]: ( ) => state.withMutations( map => {
+        map.set( "token", null )
+           .set( "isAuthenticated", false )
     } ),
-    [ SET_REDIRECT_AFTER_LOGIN ]: ( state, payload ) => Object.assign( { }, state, {
-        redirectUrl: payload.redirectUrl,
-    } ),
-    [ INITIALIZE_SESSION ]: ( state, payload ) => Object.assign( { }, state, {
-        token: payload.token,
-        isAuthenticated: true,
+    [ SET_REDIRECT_AFTER_LOGIN ]: 
+        ( state, payload ) => state.set( "redirectUrl", payload.redirectUrl ),
+    [ INITIALIZE_SESSION ]: ( state, payload ) => state.withMutations( map => {
+        map.set( "token", payload.token )
+           .set( "isAuthenticated", true )
     } ),
 } );

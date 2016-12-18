@@ -53,7 +53,7 @@ app.use( ( req, res ) => {
             res.set( "Content-Type", "text/html" )
                .status( 200 )
                .end( renderPage( reactDom, head, initialState ) );
-        } );
+        } ).catch( err => console.log( err ) );
     } );
 } );
 

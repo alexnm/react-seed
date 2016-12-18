@@ -23,6 +23,7 @@ export default function withAuthentication( WrappedComponent ) {
         },
 
         render( ) {
+            console.log( this.props.isAuthenticated );
             return (
                 <div>
                     { this.props.isAuthenticated === true ? <WrappedComponent { ...this.props } /> : null }
@@ -32,7 +33,7 @@ export default function withAuthentication( WrappedComponent ) {
     } );
 
     const mapStateToProps = ( state ) => ( {
-        isAuthenticated: state.session.isAuthenticated,
+        isAuthenticated: state.get( "session" ).get( "isAuthenticated" ),
     } );
 
     return connect( mapStateToProps )( AuthComponent );

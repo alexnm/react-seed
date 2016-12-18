@@ -1,3 +1,4 @@
+import Immutable from "immutable";
 import { createReducer } from "./utilities";
 import { Notification } from "../utilities";
 
@@ -31,13 +32,10 @@ export const initializeCart = ( items ) => ( {
     },
 } );
 
-const initialState = [ ];
+const initialState = Immutable.List( );
 
 export default createReducer( initialState )( {
-    [ ADD_TO_CART ]: ( state, payload ) => [ ...state, payload.product ],
-    [ INITIALIZE_CART ]: ( state, payload ) => payload.items,
-    [ REMOVE_FROM_CART ]: ( state, payload ) => [
-        ...state.slice( 0, payload.index ),
-        ...state.slice( payload.index + 1 ),
-    ],
+    [ ADD_TO_CART ]: ( state, payload ) => state.push( payload.product ),
+    [ INITIALIZE_CART ]: ( state, payload ) => Immutable.fromJS( payload.items ),
+    [ REMOVE_FROM_CART ]: ( state, payload ) => state.delete( payload.index ),
 } );

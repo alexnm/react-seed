@@ -39,10 +39,10 @@ const ProductDetails = React.createClass( {
         return (
             <div>
                 <h1>Product Details!</h1>
-                <h2>{ product.name }</h2>
-                <img className="product-image" src={ product.imageUrl } alt={ product.name } />
-                <p>Price: { product.price } €</p>
-                <p>Description: { product.description }</p>
+                <h2>{ product.get( "name" ) }</h2>
+                <img className="product-image" src={ product.get( "imageUrl" ) } alt={ product.get( "name" ) } />
+                <p>Price: { product.get( "price" ) } €</p>
+                <p>Description: { product.get( "description" ) }</p>
                 { isAuthenticated &&
                     <span className="link" onClick={ ( ) => onAddToCart( product ) }>
                         { Dictionary.cart.add }
@@ -54,8 +54,8 @@ const ProductDetails = React.createClass( {
 } );
 
 const mapStateToProps = ( state ) => ( {
-    product: state.selectedProduct,
-    isAuthenticated: state.session.isAuthenticated,
+    product: state.get( "selectedProduct" ),
+    isAuthenticated: state.get( "session" ).get( "isAuthenticated" ),
 } );
 
 const mapDispatchToProps = ( dispatch ) => ( {

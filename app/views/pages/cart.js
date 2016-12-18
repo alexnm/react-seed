@@ -23,7 +23,7 @@ Cart.propTypes = {
 };
 
 const mapStateToProps = ( state ) => ( {
-    items: state.cart,
+    items: state.get( "cart" )
 } );
 
 const mapDispatchToProps = ( dispatch ) => ( {

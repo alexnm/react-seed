@@ -1,3 +1,4 @@
+import Immutable from "immutable";
 import React from "react";
 import { render } from "react-dom";
 import { Provider } from "react-redux";
@@ -7,7 +8,8 @@ import createRoutes from "../app/routes";
 import configureStore from "../app/store";
 import { initializeCart } from "../app/ducks/cart";
 
-const store = configureStore( window.INITIAL_STATE );
+const immutableInitialState = Immutable.fromJS( window.INITIAL_STATE );
+const store = configureStore( immutableInitialState );
 const routes = createRoutes( store.dispatch );
 
 const rootHtml = (

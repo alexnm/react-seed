@@ -1,3 +1,4 @@
+import Immutable from "immutable";
 import { createReducer } from "./utilities";
 
 const DISMISS_NOTIFICATION = "DISMISS_NOTIFICATION";
@@ -18,15 +19,12 @@ export const dismissNotification = ( id ) => ( {
     },
 } );
 
-const initialState = [ ];
+const initialState = Immutable.List( );
 
 export default createReducer( initialState )( {
-    [ PUSH_NOTIFICATION ]: ( state, payload ) => [ ...state, payload ],
+    [ PUSH_NOTIFICATION ]: ( state, payload ) => state.push( Immutable.fromJS( payload ) ),
     [ DISMISS_NOTIFICATION ]: ( state, payload ) => {
-        const index = state.map( n => n.id ).indexOf( payload.id );
-        return [
-            ...state.slice( 0, index ),
-            ...state.slice( index + 1 ),
-        ];
+        const index = state.map( n => n.get( "id" ) ).indexOf( payload.id );
+        return state.delete( index );
     },
 } );
